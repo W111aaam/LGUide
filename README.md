@@ -1,6 +1,6 @@
-# 校园学习助手（Campus Study Hub）
+# LGUide（Campus Study Hub）
 
-面向大学生的学习工具聚合网站，将常用学习功能集中在一个简洁的页面中。
+面向cuhksz大学生的学习工具聚合网站，将常用学习功能集中在一个简洁的页面中。
 
 ## 功能规划
 
@@ -37,3 +37,9 @@ npm run build
 构建产物在 `dist/` 目录，可直接部署到 Cloudflare Pages。
 
 > **注意**：`public/_redirects` 文件已配置 SPA 路由支持，刷新页面不会 404。
+
+git push --force-with-lease
+
+git fetch origin
+git reset --hard origin/main
+git pull

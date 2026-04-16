@@ -90,6 +90,12 @@ function Schedule() {
     .filter(c => c.dayOfWeek === todayIndex)
     .sort((a, b) => a.startTime.localeCompare(b.startTime))
 
+  const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date()
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`
+  const nextCourse = todayCourses.find(c => c.startTime > currentTime)
+
   // 全部课程（按星期 → 时间排序）
   const sortedCourses = [...courses].sort((a, b) => {
     if (a.dayOfWeek !== b.dayOfWeek) return a.dayOfWeek - b.dayOfWeek
@@ -242,6 +248,28 @@ function Schedule() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── 下一节课 ── */}
+      <section>
+        <h2 className="text-base font-semibold text-gray-600 mb-3">下一节课</h2>
+        {nextCourse ? (
+          <div className="bg-white border border-indigo-200 rounded-2xl p-5">
+            <p className="text-base font-semibold text-gray-800">{nextCourse.courseName}</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {nextCourse.startTime}–{nextCourse.endTime}
+            </p>
+            {nextCourse.location && (
+              <p className="text-sm text-gray-500 mt-1">地点：{nextCourse.location}</p>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-xl p-5 text-gray-500 text-sm">
+            {todayCourses.length === 0
+              ? '今天没有课程，快去添加你的课表吧。'
+              : '今天已经没有后续课程了，祝你剩余时间高效。'}
           </div>
         )}
       </section>

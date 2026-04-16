@@ -13,7 +13,7 @@ function NavBar() {
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center h-14 gap-6">
-          <span className="font-bold text-indigo-600 text-lg">学习助手</span>
+          <span className="font-bold text-indigo-600 text-lg">LGUide</span>
           <nav className="flex gap-1">
             {navItems.map(item => (
               <NavLink

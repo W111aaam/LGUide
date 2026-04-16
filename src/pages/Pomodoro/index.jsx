@@ -67,28 +67,6 @@ function createTomatoPhysicsForce() {
         continue
       }
 
-      if (node.state === 'exploding') {
-        node.vx *= 0.9
-        node.vy *= 0.9
-        node.explosionProgress = Math.min(1, (node.explosionProgress || 0) + 0.038)
-        const SWELL_END = 0.38
-        const isBursting = node.explosionProgress > SWELL_END
-        // stainFade only starts decaying after the burst begins
-        if (isBursting) {
-          node.stainFade = Math.max(0, (node.stainFade ?? 1) - 0.008)
-        } else {
-          node.stainFade = 1
-        }
-        // during swell phase opacity stays 1; after burst it drops instantly
-        node.opacity = isBursting ? 0 : 1
-        node.rotation *= 0.97
-        node.squashPhase = 0
-        if (isBursting && node.stainFade <= 0.02) {
-          node.remove = true
-        }
-        continue
-      }
-
       if (node.state === 'fading') {
         node.vx *= 0.96
         node.vy *= 0.9
@@ -137,7 +115,7 @@ function createTomatoPhysicsForce() {
   }
 
   force.initialize = nextNodes => {
-    nodes = nextNodes
+    nodes = nextNodes.filter(n => n.state !== 'exploding')
   }
 
   return force
@@ -221,10 +199,34 @@ function Pomodoro() {
           const filteredNodes = nodesRef.current.filter(node => !node.remove)
           if (filteredNodes.length !== nodesRef.current.length) {
             nodesRef.current = filteredNodes
-            simulation.nodes(nodesRef.current)
+            simulation.nodes(nodesRef.current.filter(node => node.state !== 'exploding'))
           }
 
-          setTomatoNodes(filteredNodes.map(node => ({ ...node })))
+          // 单独处理 exploding 节点
+          nodesRef.current.forEach(node => {
+            if (node.state === 'exploding') {
+              node.vx *= 0.9
+              node.vy *= 0.9
+              node.explosionProgress = Math.min(1, (node.explosionProgress || 0) + 0.038)
+              const SWELL_END = 0.38
+              const isBursting = node.explosionProgress > SWELL_END
+              if (isBursting) {
+                node.stainFade = Math.max(0, (node.stainFade ?? 1) - 0.008)
+              } else {
+                node.stainFade = 1
+              }
+              node.opacity = isBursting ? 0 : 1
+              node.rotation *= 0.97
+              node.squashPhase = 0
+              if (isBursting && node.stainFade <= 0.02) {
+                node.remove = true
+              }
+            }
+          })
+
+          // 再次过滤掉新标记为 remove 的节点
+          const finalRenderedNodes = nodesRef.current.filter(node => !node.remove)
+          setTomatoNodes(finalRenderedNodes.map(node => ({ ...node })))
 
           // stop when nothing is moving; restart on spawn/drag
           const hasMoving = nodesRef.current.some(
@@ -294,7 +296,8 @@ function Pomodoro() {
   function refreshSimulation(alpha = 0.7) {
     const simulation = simulationRef.current
     if (!simulation) return
-    simulation.nodes(nodesRef.current)
+    // 始终过滤掉 exploding 节点，确保它们不再参与物理系统
+    simulation.nodes(nodesRef.current.filter(node => node.state !== 'exploding'))
     simulation.alpha(alpha).restart()
   }
 
@@ -556,24 +559,6 @@ function Pomodoro() {
             )
           })}
 
-          {tomatoNodes.map(node => (
-            <div
-              key={`${node.id}-emoji`}
-              className="absolute select-none leading-none will-change-transform"
-              style={{
-                left: `${node.x}px`,
-                top: `${node.y}px`,
-                opacity: node.opacity,
-                transform: getTomatoTransform(node),
-                filter: 'drop-shadow(0 18px 26px rgba(154, 52, 18, 0.24))',
-                fontSize: '5.8rem',
-                textShadow: '0 10px 18px rgba(251, 146, 60, 0.28)',
-              }}
-            >
-              🍅
-            </div>
-          ))}
-
           {tomatoNodes
             .filter(node => node.state === 'exploding')
             .map(node => {
@@ -593,6 +578,8 @@ function Pomodoro() {
                   className="absolute top-0 left-0 will-change-transform"
                   style={{
                     transform: `translate(${node.x}px, ${node.y}px)`,
+                    zIndex: 0,
+                    pointerEvents: 'none',
                   }}
                 >
                   <div
@@ -714,6 +701,26 @@ function Pomodoro() {
                 </div>
               )
             })}
+
+          {tomatoNodes
+            .filter(node => node.state !== 'exploding')
+            .map(node => (
+            <div
+              key={`${node.id}-emoji`}
+              className="absolute select-none leading-none will-change-transform"
+              style={{
+                left: `${node.x}px`,
+                top: `${node.y}px`,
+                opacity: node.opacity,
+                transform: getTomatoTransform(node),
+                filter: 'drop-shadow(0 18px 26px rgba(154, 52, 18, 0.24))',
+                fontSize: '5.8rem',
+                textShadow: '0 10px 18px rgba(251, 146, 60, 0.28)',
+              }}
+            >
+              🍅
+            </div>
+          ))}
         </div>
 
         <div className="relative z-10 flex h-full items-center justify-center pointer-events-none">
@@ -767,7 +774,7 @@ function Pomodoro() {
                   />
                 </svg>
 
-                <div className="absolute inset-[16px] flex items-center justify-center rounded-full bg-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_16px_30px_rgba(255,255,255,0.2)]">
+                <div className="absolute inset-[16px] flex items-center justify-center rounded-full bg-white/92 shadow-[0_16px_30px_rgba(255,255,255,0.2)]">
                   <span
                     className={`text-[2.7rem] font-bold font-mono tracking-tight ${
                       isFocus ? 'text-indigo-600' : 'text-green-600'

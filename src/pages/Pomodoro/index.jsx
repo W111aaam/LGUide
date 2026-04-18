@@ -3,7 +3,10 @@ import { forceCollide, forceSimulation } from 'd3-force'
 import { load, save } from '../../utils/storage'
 
 // 时长常量（后续可由设置页写入 localStorage 后读取）
-const FOCUS_MINUTES = 25     // 正式版改回 25
+const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
+const DEFAULT_FOCUS_MINUTES = 25
+const MIN_FOCUS_MINUTES = 10
+const MAX_FOCUS_MINUTES = 120
 const BREAK_MINUTES = 5
 
 const STATS_KEY = 'pomodoroStats'
@@ -13,6 +16,24 @@ const TOMATO_SCENE = {
   floorPadding: 18,
 }
 const TOMATO_RADIUS = 42
+
+function normalizeFocusMinutes(value) {
+  const parsed = Number.parseInt(String(value), 10)
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_FOCUS_MINUTES
+  }
+  return Math.max(MIN_FOCUS_MINUTES, Math.min(MAX_FOCUS_MINUTES, parsed))
+}
+
+function getTomatoEmojiFontSize(focusMinutes) {
+  const BASE_MINUTES = 25
+  const BASE_SIZE = 5.8
+  const relativeScale = focusMinutes / BASE_MINUTES
+  const boostedScale = relativeScale <= 1 ? relativeScale : 1 + (relativeScale - 1) * 2
+  const rawSize = BASE_SIZE * boostedScale
+  const cappedSize = Math.min(12.8, rawSize)
+  return `${cappedSize.toFixed(2)}rem`
+}
 
 function createSettledTomatoes(count) {
   const columns = 8
@@ -162,12 +183,17 @@ function loadTodayCount() {
 // ---- 主组件 ----
 
 function Pomodoro() {
+  const [focusMinutes] = useState(() =>
+    normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
+  )
   const [mode, setMode] = useState('focus')       // 'focus' | 'break'
   const [status, setStatus] = useState('idle')    // 'idle' | 'running' | 'paused'
-  const [timeLeft, setTimeLeft] = useState(FOCUS_MINUTES * 60)
+  const [timeLeft, setTimeLeft] = useState(focusMinutes * 60)
   const [todayCount, setTodayCount] = useState(() => loadTodayCount())
   const [notification, setNotification] = useState(null)
   const [tomatoNodes, setTomatoNodes] = useState(() => createSettledTomatoes(loadTodayCount()))
+
+  const tomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
 
   const nodesRef = useRef([])
   const simulationRef = useRef(null)
@@ -280,10 +306,10 @@ function Pomodoro() {
     } else {
       focusTomatoSpawnedRef.current = false
       setMode('focus')
-      setTimeLeft(FOCUS_MINUTES * 60)
+      setTimeLeft(focusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode])
+  }, [timeLeft, status, mode, focusMinutes])
 
   function showNotification(msg) {
     setNotification(msg)
@@ -484,7 +510,7 @@ function Pomodoro() {
       focusTomatoSpawnedRef.current = false
     }
     setStatus('idle')
-    setTimeLeft(mode === 'focus' ? FOCUS_MINUTES * 60 : BREAK_MINUTES * 60)
+    setTimeLeft(mode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60)
   }
 
   function handleSwitchMode(newMode) {
@@ -498,11 +524,11 @@ function Pomodoro() {
     }
     setMode(newMode)
     setStatus('idle')
-    setTimeLeft(newMode === 'focus' ? FOCUS_MINUTES * 60 : BREAK_MINUTES * 60)
+    setTimeLeft(newMode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60)
   }
 
   const isFocus = mode === 'focus'
-  const totalSeconds = (isFocus ? FOCUS_MINUTES : BREAK_MINUTES) * 60
+  const totalSeconds = (isFocus ? focusMinutes : BREAK_MINUTES) * 60
   const progress = totalSeconds > 0 ? (totalSeconds - timeLeft) / totalSeconds : 0
   const ringRadius = 72
   const ringCircumference = 2 * Math.PI * ringRadius
@@ -714,7 +740,7 @@ function Pomodoro() {
                 opacity: node.opacity,
                 transform: getTomatoTransform(node),
                 filter: 'drop-shadow(0 18px 26px rgba(154, 52, 18, 0.24))',
-                fontSize: '5.8rem',
+                fontSize: tomatoEmojiFontSize,
                 textShadow: '0 10px 18px rgba(251, 146, 60, 0.28)',
               }}
             >

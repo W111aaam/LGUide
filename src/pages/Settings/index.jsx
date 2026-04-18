@@ -1,20 +1,68 @@
-function SettingRow({ label, description, badge }) {
+import { useState } from 'react'
+import { load, save } from '../../utils/storage'
+
+const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
+const DEFAULT_FOCUS_MINUTES = 25
+const MIN_FOCUS_MINUTES = 10
+const MAX_FOCUS_MINUTES = 120
+
+function normalizeFocusMinutes(value) {
+  const parsed = Number.parseInt(String(value), 10)
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_FOCUS_MINUTES
+  }
+  return Math.max(MIN_FOCUS_MINUTES, Math.min(MAX_FOCUS_MINUTES, parsed))
+}
+
+function SettingRow({ label, description, badge, children }) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
-      <div>
-        <p className="text-sm font-medium text-gray-700">{label}</p>
-        {description && (
-          <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+    <div className="py-4 border-b border-gray-100 last:border-0">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-700">{label}</p>
+          {description && (
+            <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+          )}
+        </div>
+        {badge && (
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">
+            {badge}
+          </span>
         )}
       </div>
-      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-        {badge}
-      </span>
+      {children}
     </div>
   )
 }
 
 function Settings() {
+  const [focusMinutes, setFocusMinutes] = useState(() =>
+    normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
+  )
+  const [focusInputValue, setFocusInputValue] = useState(() => String(focusMinutes))
+
+  function commitFocusMinutes(rawValue) {
+    const next = normalizeFocusMinutes(rawValue)
+    setFocusMinutes(next)
+    setFocusInputValue(String(next))
+    save(FOCUS_MINUTES_KEY, next)
+  }
+
+  function handleFocusInputBlur() {
+    commitFocusMinutes(focusInputValue)
+  }
+
+  function handleFocusInputKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur()
+      return
+    }
+    if (event.key === 'Escape') {
+      setFocusInputValue(String(focusMinutes))
+      event.currentTarget.blur()
+    }
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">设置</h1>
@@ -28,8 +76,39 @@ function Settings() {
         <SettingRow
           label="番茄钟时长"
           description="单次专注时间（分钟）"
-          badge="25 分钟"
-        />
+          badge={`${focusMinutes} 分钟`}
+        >
+          <div className="w-full mt-3 flex items-center gap-3">
+            <input
+              type="range"
+              min={MIN_FOCUS_MINUTES}
+              max={MAX_FOCUS_MINUTES}
+              step="1"
+              value={focusMinutes}
+              onChange={e => commitFocusMinutes(e.target.value)}
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-orange-100 accent-orange-500"
+            />
+            <div className="flex items-center gap-1 shrink-0">
+              <input
+                type="number"
+                inputMode="numeric"
+                min={MIN_FOCUS_MINUTES}
+                max={MAX_FOCUS_MINUTES}
+                value={focusInputValue}
+                onChange={e => setFocusInputValue(e.target.value)}
+                onBlur={handleFocusInputBlur}
+                onKeyDown={handleFocusInputKeyDown}
+                className="w-16 text-xs text-right text-gray-700 bg-white border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-orange-200"
+                aria-label="番茄钟时长输入"
+              />
+              <span className="text-xs text-gray-500">分钟</span>
+            </div>
+          </div>
+          <div className="mt-1 flex items-center justify-between text-[11px] text-gray-400">
+            <span>{MIN_FOCUS_MINUTES} 分钟</span>
+            <span>2 小时</span>
+          </div>
+        </SettingRow>
         <SettingRow
           label="短休息时长"
           description="每个番茄钟后的短休息"

@@ -3,7 +3,7 @@ import { forceCollide, forceSimulation } from 'd3-force'
 import { load, save } from '../../utils/storage'
 
 // 时长常量（后续可由设置页写入 localStorage 后读取）
-const FOCUS_MINUTES = 1     // 正式版改回 25
+const FOCUS_MINUTES = 25     // 正式版改回 25
 const BREAK_MINUTES = 5
 
 const STATS_KEY = 'pomodoroStats'

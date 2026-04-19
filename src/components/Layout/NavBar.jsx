@@ -10,10 +10,10 @@ const navItems = [
 
 function NavBar() {
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="bg-white border-b border-gray-200 shadow-sm transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950/92">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center h-14 gap-6">
-          <span className="font-bold text-indigo-600 text-lg">LGUide</span>
+          <span className="font-bold text-indigo-600 text-lg dark:text-orange-300">LGUide</span>
           <nav className="flex gap-1">
             {navItems.map(item => (
               <NavLink
@@ -23,8 +23,8 @@ function NavBar() {
                 className={({ isActive }) =>
                   `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-indigo-50 text-indigo-600'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-orange-300'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
                   }`
                 }
               >

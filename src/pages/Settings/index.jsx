@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { load, save } from '../../utils/storage'
+import { getStoredTheme, saveTheme, THEMES } from '../../utils/theme'
 
 const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
 const DEFAULT_FOCUS_MINUTES = 25
@@ -16,16 +17,16 @@ function normalizeFocusMinutes(value) {
 
 function SettingRow({ label, description, badge, children }) {
   return (
-    <div className="py-4 border-b border-gray-100 last:border-0">
+    <div className="py-4 border-b border-gray-100 last:border-0 dark:border-slate-800">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-gray-700">{label}</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-slate-100">{label}</p>
           {description && (
-            <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+            <p className="text-xs text-gray-400 mt-0.5 dark:text-slate-500">{description}</p>
           )}
         </div>
         {badge && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded whitespace-nowrap dark:bg-slate-800 dark:text-slate-400">
             {badge}
           </span>
         )}
@@ -40,6 +41,7 @@ function Settings() {
     normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
   )
   const [focusInputValue, setFocusInputValue] = useState(() => String(focusMinutes))
+  const [theme, setTheme] = useState(() => getStoredTheme())
 
   function commitFocusMinutes(rawValue) {
     const next = normalizeFocusMinutes(rawValue)
@@ -63,16 +65,47 @@ function Settings() {
     }
   }
 
+  function handleThemeChange(nextTheme) {
+    setTheme(saveTheme(nextTheme))
+  }
+
+  const themeOptions = [
+    { value: THEMES.LIGHT, label: '浅色', icon: '☀️' },
+    { value: THEMES.DARK, label: '深色', icon: '🌙' },
+  ]
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">设置</h1>
+      <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">设置</h1>
 
-      <div className="bg-white border border-gray-200 rounded-xl px-5">
+      <div className="bg-white border border-gray-200 rounded-xl px-5 dark:border-slate-800 dark:bg-slate-900/88">
         <SettingRow
           label="网站主题"
           description="浅色 / 深色主题切换"
-          badge="待实现"
-        />
+          badge={theme === THEMES.DARK ? '深色' : '浅色'}
+        >
+          <div className="mt-3 inline-flex rounded-full border border-gray-200 bg-gray-100 p-1 dark:border-slate-700 dark:bg-slate-950">
+            {themeOptions.map(option => {
+              const isActive = theme === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleThemeChange(option.value)}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-800 dark:text-orange-300'
+                      : 'text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-100'
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  <span aria-hidden="true">{option.icon}</span>
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </SettingRow>
         <SettingRow
           label="番茄钟时长"
           description="单次专注时间（分钟）"
@@ -98,13 +131,13 @@ function Settings() {
                 onChange={e => setFocusInputValue(e.target.value)}
                 onBlur={handleFocusInputBlur}
                 onKeyDown={handleFocusInputKeyDown}
-                className="w-16 text-xs text-right text-gray-700 bg-white border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-orange-200"
+                className="w-16 text-xs text-right text-gray-700 bg-white border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-orange-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                 aria-label="番茄钟时长输入"
               />
-              <span className="text-xs text-gray-500">分钟</span>
+              <span className="text-xs text-gray-500 dark:text-slate-400">分钟</span>
             </div>
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px] text-gray-400">
+          <div className="mt-1 flex items-center justify-between text-[11px] text-gray-400 dark:text-slate-500">
             <span>{MIN_FOCUS_MINUTES} 分钟</span>
             <span>2 小时</span>
           </div>

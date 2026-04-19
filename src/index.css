@@ -1,3 +1,270 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  background: #f9fafb;
+}
+
+html.dark {
+  background: #020617;
+}
+
+body {
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+/* Broad dark-mode polish for existing utility-heavy pages. */
+.dark .bg-white {
+  background-color: rgb(15 23 42 / 0.92);
+}
+
+.dark .bg-gray-50 {
+  background-color: #020617;
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(30 41 59 / 0.88);
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: rgb(51 65 85);
+}
+
+.dark .border-indigo-200 {
+  border-color: rgb(99 102 241 / 0.34);
+}
+
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: rgb(241 245 249);
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: rgb(148 163 184);
+}
+
+.dark .text-gray-400 {
+  color: rgb(100 116 139);
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: rgb(2 6 23 / 0.78);
+  color: rgb(241 245 249);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgb(100 116 139);
+}
+
+.dark input[type='date'],
+.dark input[type='time'] {
+  color-scheme: dark;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.32);
+}
+
+.pomodoro-page {
+  --pomodoro-title: #1f2937;
+  --pomodoro-scene-bg: radial-gradient(circle at top, rgb(255 237 213 / 0.95), rgb(255 255 255 / 0.98) 56%);
+  --pomodoro-scene-border: rgb(255 237 213);
+  --pomodoro-scene-shadow: 0 30px 80px rgb(99 102 241 / 0.08);
+  --pomodoro-top-glow: linear-gradient(to bottom, rgb(255 237 213 / 0.65), transparent);
+  --pomodoro-floor-glow: rgb(254 215 170 / 0.4);
+  --pomodoro-kicker: #fb923c;
+  --pomodoro-scene-hint: #fdba74;
+  --pomodoro-panel-bg: rgb(255 255 255 / 0.82);
+  --pomodoro-panel-border: rgb(255 255 255 / 0.7);
+  --pomodoro-panel-shadow: 0 24px 60px rgb(15 23 42 / 0.16);
+  --pomodoro-switch-bg: rgb(243 244 246 / 0.9);
+  --pomodoro-tab: #6b7280;
+  --pomodoro-tab-hover: #374151;
+  --pomodoro-tab-active-bg: #ffffff;
+  --pomodoro-tab-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+  --pomodoro-focus-accent: #4f46e5;
+  --pomodoro-focus-accent-hover: #4338ca;
+  --pomodoro-focus-track: rgb(199 210 254 / 0.9);
+  --pomodoro-break-accent: #16a34a;
+  --pomodoro-break-accent-hover: #15803d;
+  --pomodoro-break-track: rgb(187 247 208 / 0.95);
+  --pomodoro-timer-core-bg: rgb(255 255 255 / 0.92);
+  --pomodoro-timer-core-shadow: 0 16px 30px rgb(255 255 255 / 0.2);
+  --pomodoro-reset-bg: #f3f4f6;
+  --pomodoro-reset-bg-hover: #e5e7eb;
+  --pomodoro-reset-text: #4b5563;
+  --pomodoro-count-text: #9ca3af;
+  --pomodoro-count-number: #374151;
+  --pomodoro-notification-bg: #eef2ff;
+  --pomodoro-notification-border: #c7d2fe;
+  --pomodoro-notification-text: #4338ca;
+  --pomodoro-tomato-shadow: rgb(124 45 18 / 0.18);
+  --pomodoro-tomato-drop-shadow: drop-shadow(0 18px 26px rgb(154 52 18 / 0.24));
+  --pomodoro-tomato-text-shadow: 0 10px 18px rgb(251 146 60 / 0.28);
+}
+
+.dark .pomodoro-page {
+  --pomodoro-title: #f8fafc;
+  --pomodoro-scene-bg:
+    radial-gradient(circle at 50% -10%, rgb(79 70 229 / 0.28), transparent 38%),
+    radial-gradient(circle at 18% 18%, rgb(249 115 22 / 0.14), transparent 30%),
+    linear-gradient(145deg, rgb(2 6 23), rgb(15 23 42) 54%, rgb(30 41 59));
+  --pomodoro-scene-border: rgb(99 102 241 / 0.24);
+  --pomodoro-scene-shadow: 0 34px 90px rgb(0 0 0 / 0.42);
+  --pomodoro-top-glow: linear-gradient(to bottom, rgb(99 102 241 / 0.22), transparent);
+  --pomodoro-floor-glow: rgb(249 115 22 / 0.16);
+  --pomodoro-kicker: #fdba74;
+  --pomodoro-scene-hint: #94a3b8;
+  --pomodoro-panel-bg: rgb(15 23 42 / 0.72);
+  --pomodoro-panel-border: rgb(148 163 184 / 0.18);
+  --pomodoro-panel-shadow: 0 24px 80px rgb(0 0 0 / 0.48), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --pomodoro-switch-bg: rgb(2 6 23 / 0.68);
+  --pomodoro-tab: #94a3b8;
+  --pomodoro-tab-hover: #e2e8f0;
+  --pomodoro-tab-active-bg: rgb(30 41 59 / 0.92);
+  --pomodoro-tab-shadow: 0 10px 24px rgb(0 0 0 / 0.28);
+  --pomodoro-focus-accent: #818cf8;
+  --pomodoro-focus-accent-hover: #6366f1;
+  --pomodoro-focus-track: rgb(67 56 202 / 0.32);
+  --pomodoro-break-accent: #34d399;
+  --pomodoro-break-accent-hover: #10b981;
+  --pomodoro-break-track: rgb(6 95 70 / 0.34);
+  --pomodoro-timer-core-bg: rgb(2 6 23 / 0.72);
+  --pomodoro-timer-core-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 18px 34px rgb(0 0 0 / 0.32);
+  --pomodoro-reset-bg: rgb(30 41 59 / 0.82);
+  --pomodoro-reset-bg-hover: rgb(51 65 85 / 0.9);
+  --pomodoro-reset-text: #cbd5e1;
+  --pomodoro-count-text: #94a3b8;
+  --pomodoro-count-number: #f8fafc;
+  --pomodoro-notification-bg: rgb(30 41 59 / 0.88);
+  --pomodoro-notification-border: rgb(129 140 248 / 0.32);
+  --pomodoro-notification-text: #c7d2fe;
+  --pomodoro-tomato-shadow: rgb(0 0 0 / 0.32);
+  --pomodoro-tomato-drop-shadow: drop-shadow(0 20px 34px rgb(0 0 0 / 0.34));
+  --pomodoro-tomato-text-shadow: 0 12px 24px rgb(249 115 22 / 0.32);
+}
+
+.pomodoro-title {
+  color: var(--pomodoro-title);
+}
+
+.pomodoro-notification {
+  color: var(--pomodoro-notification-text);
+  background: var(--pomodoro-notification-bg);
+  border: 1px solid var(--pomodoro-notification-border);
+}
+
+.pomodoro-scene {
+  background: var(--pomodoro-scene-bg);
+  border: 1px solid var(--pomodoro-scene-border);
+  box-shadow: var(--pomodoro-scene-shadow);
+}
+
+.pomodoro-top-glow {
+  background: var(--pomodoro-top-glow);
+}
+
+.pomodoro-floor-glow {
+  background: var(--pomodoro-floor-glow);
+}
+
+.pomodoro-kicker {
+  color: var(--pomodoro-kicker);
+}
+
+.pomodoro-scene-hint {
+  color: var(--pomodoro-scene-hint);
+}
+
+.pomodoro-tomato-shadow {
+  background: var(--pomodoro-tomato-shadow);
+}
+
+.pomodoro-panel {
+  background: var(--pomodoro-panel-bg);
+  border: 1px solid var(--pomodoro-panel-border);
+  box-shadow: var(--pomodoro-panel-shadow);
+}
+
+.pomodoro-mode-switch {
+  background: var(--pomodoro-switch-bg);
+}
+
+.pomodoro-mode-button {
+  color: var(--pomodoro-tab);
+}
+
+.pomodoro-mode-button:hover {
+  color: var(--pomodoro-tab-hover);
+}
+
+.pomodoro-mode-button.is-active {
+  background: var(--pomodoro-tab-active-bg);
+  box-shadow: var(--pomodoro-tab-shadow);
+}
+
+.pomodoro-mode-button.is-focus {
+  color: var(--pomodoro-focus-accent);
+}
+
+.pomodoro-mode-button.is-break {
+  color: var(--pomodoro-break-accent);
+}
+
+.pomodoro-timer-core {
+  background: var(--pomodoro-timer-core-bg);
+  box-shadow: var(--pomodoro-timer-core-shadow);
+}
+
+.pomodoro-time-text.pomodoro-mode-focus {
+  color: var(--pomodoro-focus-accent);
+}
+
+.pomodoro-time-text.pomodoro-mode-break {
+  color: var(--pomodoro-break-accent);
+}
+
+.pomodoro-action-button {
+  color: #ffffff;
+}
+
+.pomodoro-action-button.pomodoro-mode-focus {
+  background: var(--pomodoro-focus-accent);
+}
+
+.pomodoro-action-button.pomodoro-mode-focus:hover {
+  background: var(--pomodoro-focus-accent-hover);
+}
+
+.pomodoro-action-button.pomodoro-mode-break {
+  background: var(--pomodoro-break-accent);
+}
+
+.pomodoro-action-button.pomodoro-mode-break:hover {
+  background: var(--pomodoro-break-accent-hover);
+}
+
+.pomodoro-reset-button {
+  color: var(--pomodoro-reset-text);
+  background: var(--pomodoro-reset-bg);
+}
+
+.pomodoro-reset-button:hover {
+  background: var(--pomodoro-reset-bg-hover);
+}
+
+.pomodoro-count-text {
+  color: var(--pomodoro-count-text);
+}
+
+.pomodoro-count-number {
+  color: var(--pomodoro-count-number);
+}

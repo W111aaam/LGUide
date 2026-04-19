@@ -28,12 +28,13 @@ function normalizeFocusMinutes(value) {
 
 function getTomatoEmojiFontSize(focusMinutes) {
   const BASE_MINUTES = 25
-  const BASE_SIZE = 5.8
-  const relativeScale = focusMinutes / BASE_MINUTES
-  const boostedScale = relativeScale <= 1 ? relativeScale : 1 + (relativeScale - 1) * 2
-  const rawSize = BASE_SIZE * boostedScale
-  const cappedSize = Math.min(12.8, rawSize)
-  return `${cappedSize.toFixed(2)}rem`
+  const BASE_SIZE_REM = 5.8
+  const MAX_MINUTES = 120
+  const MAX_SIZE_REM = 21
+  const clampedMinutes = Math.max(MIN_FOCUS_MINUTES, Math.min(MAX_MINUTES, Number(focusMinutes)))
+  const minutesProgress = (clampedMinutes - BASE_MINUTES) / (MAX_MINUTES - BASE_MINUTES)
+  const size = BASE_SIZE_REM + minutesProgress * (MAX_SIZE_REM - BASE_SIZE_REM)
+  return `${size.toFixed(2)}rem`
 }
 
 function createSettledTomatoes(count) {
@@ -554,31 +555,32 @@ function Pomodoro() {
   const ringRadius = 72
   const ringCircumference = 2 * Math.PI * ringRadius
   const ringOffset = ringCircumference * (1 - Math.min(1, Math.max(0, progress)))
+  const activeModeClass = isFocus ? 'pomodoro-mode-focus' : 'pomodoro-mode-break'
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-800">番茄钟</h1>
+    <div className="pomodoro-page space-y-4">
+      <h1 className="pomodoro-title text-2xl font-bold">番茄钟</h1>
 
       {/* 倒计时结束通知 */}
       {notification && (
-        <div className="bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm px-4 py-3 rounded-xl">
+        <div className="pomodoro-notification text-sm px-4 py-3 rounded-xl">
           {notification}
         </div>
       )}
 
       <div
         ref={sceneRef}
-        className="relative overflow-hidden rounded-[2rem] border border-orange-100 bg-[radial-gradient(circle_at_top,_rgba(255,237,213,0.95),_rgba(255,255,255,0.98)_56%)] shadow-[0_30px_80px_rgba(99,102,241,0.08)] h-[680px] select-none"
+        className="pomodoro-scene relative overflow-hidden rounded-[2rem] h-[680px] select-none"
         style={{ cursor: isDragging ? 'grabbing' : 'default' }}
         onMouseDown={handleSceneMouseDown}
       >
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-orange-100/65 to-transparent" />
-          <div className="absolute inset-x-10 bottom-10 h-20 rounded-full bg-orange-200/40 blur-3xl" />
-          <div className="absolute left-6 top-6 text-xs font-semibold uppercase tracking-[0.32em] text-orange-400">
+          <div className="pomodoro-top-glow absolute inset-x-0 top-0 h-32" />
+          <div className="pomodoro-floor-glow absolute inset-x-10 bottom-10 h-20 rounded-full blur-3xl" />
+          <div className="pomodoro-kicker absolute left-6 top-6 text-xs font-semibold uppercase tracking-[0.32em]">
             Focus Gravity
           </div>
-          <div className="absolute right-6 top-6 text-sm text-orange-300">
+          <div className="pomodoro-scene-hint absolute right-6 top-6 text-sm">
             开始专注时会掉下一颗新番茄
           </div>
 
@@ -596,7 +598,7 @@ function Pomodoro() {
                 }}
               >
                 <div
-                  className="h-7 rounded-full bg-orange-900/18 blur-md"
+                  className="pomodoro-tomato-shadow h-7 rounded-full blur-md"
                   style={{
                     width: `${node.radius * 1.45}px`,
                     transform: `scaleX(${shadowScale})`,
@@ -760,9 +762,9 @@ function Pomodoro() {
                 top: `${node.y}px`,
                 opacity: node.opacity,
                 transform: getTomatoTransform(node),
-                filter: 'drop-shadow(0 18px 26px rgba(154, 52, 18, 0.24))',
+                filter: 'var(--pomodoro-tomato-drop-shadow)',
                 fontSize: tomatoEmojiFontSize,
-                textShadow: '0 10px 18px rgba(251, 146, 60, 0.28)',
+                textShadow: 'var(--pomodoro-tomato-text-shadow)',
               }}
             >
               🍅
@@ -771,25 +773,21 @@ function Pomodoro() {
         </div>
 
         <div className="relative z-10 flex h-full items-center justify-center pointer-events-none">
-          <div className="w-full max-w-[22rem] rounded-[2rem] border border-white/70 bg-white/82 px-5 py-6 text-center shadow-[0_24px_60px_rgba(15,23,42,0.16)] backdrop-blur-md sm:px-7 sm:py-8 pointer-events-none">
+          <div className="pomodoro-panel w-full max-w-[22rem] rounded-[2rem] px-5 py-6 text-center backdrop-blur-md sm:px-7 sm:py-8 pointer-events-none">
             <div className="flex justify-center">
-              <div className="flex gap-2 bg-gray-100/90 rounded-lg p-1 pointer-events-auto">
+              <div className="pomodoro-mode-switch flex gap-2 rounded-lg p-1 pointer-events-auto">
                 <button
                   onClick={() => handleSwitchMode('focus')}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    isFocus
-                      ? 'bg-white text-indigo-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                  className={`pomodoro-mode-button px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    isFocus ? 'is-active is-focus' : ''
                   }`}
                 >
                   专注模式
                 </button>
                 <button
                   onClick={() => handleSwitchMode('break')}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    !isFocus
-                      ? 'bg-white text-green-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                  className={`pomodoro-mode-button px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    !isFocus ? 'is-active is-break' : ''
                   }`}
                 >
                   休息模式
@@ -805,7 +803,7 @@ function Pomodoro() {
                     cy="88"
                     r={ringRadius}
                     fill="none"
-                    stroke={isFocus ? 'rgba(199, 210, 254, 0.9)' : 'rgba(187, 247, 208, 0.95)'}
+                    stroke={isFocus ? 'var(--pomodoro-focus-track)' : 'var(--pomodoro-break-track)'}
                     strokeWidth="12"
                   />
                   <circle
@@ -813,7 +811,7 @@ function Pomodoro() {
                     cy="88"
                     r={ringRadius}
                     fill="none"
-                    stroke={isFocus ? '#4f46e5' : '#16a34a'}
+                    stroke={isFocus ? 'var(--pomodoro-focus-accent)' : 'var(--pomodoro-break-accent)'}
                     strokeWidth="12"
                     strokeLinecap="round"
                     strokeDasharray={ringCircumference}
@@ -821,11 +819,9 @@ function Pomodoro() {
                   />
                 </svg>
 
-                <div className="absolute inset-[16px] flex items-center justify-center rounded-full bg-white/92 shadow-[0_16px_30px_rgba(255,255,255,0.2)]">
+                <div className="pomodoro-timer-core absolute inset-[16px] flex items-center justify-center rounded-full">
                   <span
-                    className={`text-[2.7rem] font-bold font-mono tracking-tight ${
-                      isFocus ? 'text-indigo-600' : 'text-green-600'
-                    }`}
+                    className={`pomodoro-time-text ${activeModeClass} text-[2.7rem] font-bold font-mono tracking-tight`}
                   >
                     {formatTime(timeLeft)}
                   </span>
@@ -837,37 +833,29 @@ function Pomodoro() {
               {status === 'running' ? (
                 <button
                   onClick={handlePause}
-                  className={`px-7 py-2.5 rounded-full font-medium text-white transition-colors ${
-                    isFocus
-                      ? 'bg-indigo-600 hover:bg-indigo-700'
-                      : 'bg-green-600 hover:bg-green-700'
-                  }`}
+                  className={`pomodoro-action-button ${activeModeClass} px-7 py-2.5 rounded-full font-medium transition-colors`}
                 >
                   暂停
                 </button>
               ) : (
                 <button
                   onClick={handleStart}
-                  className={`px-7 py-2.5 rounded-full font-medium text-white transition-colors ${
-                    isFocus
-                      ? 'bg-indigo-600 hover:bg-indigo-700'
-                      : 'bg-green-600 hover:bg-green-700'
-                  }`}
+                  className={`pomodoro-action-button ${activeModeClass} px-7 py-2.5 rounded-full font-medium transition-colors`}
                 >
                   {status === 'paused' ? '继续' : '开始'}
                 </button>
               )}
               <button
                 onClick={handleReset}
-                className="px-7 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full font-medium transition-colors"
+                className="pomodoro-reset-button px-7 py-2.5 rounded-full font-medium transition-colors"
               >
                 重置
               </button>
             </div>
 
-            <p className="mt-5 text-sm text-gray-400">
+            <p className="pomodoro-count-text mt-5 text-sm">
               今日已完成{' '}
-              <span className="font-bold text-gray-700 text-base">{todayCount}</span>{' '}
+              <span className="pomodoro-count-number font-bold text-base">{todayCount}</span>{' '}
               个番茄
             </p>
           </div>

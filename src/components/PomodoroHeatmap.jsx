@@ -90,45 +90,45 @@ function PomodoroHeatmap() {
   const completedCount = stats?.totals?.completed_count || 0
 
   return (
-    <section className="rounded-[2rem] border border-orange-100 bg-white p-5 shadow-[0_24px_70px_rgba(154,52,18,0.08)] sm:p-6">
+    <section className="rounded-[2rem] border border-orange-100 bg-white p-5 shadow-[0_24px_70px_rgba(154,52,18,0.08)] dark:border-orange-500/20 dark:bg-slate-900/88 dark:shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-orange-400">Tomato Heatmap</p>
-          <h2 className="mt-2 text-xl font-bold text-gray-900">番茄投入热力图</h2>
+          <h2 className="mt-2 text-xl font-bold text-gray-900 dark:text-slate-100">番茄投入热力图</h2>
         </div>
         <button
           type="button"
           onClick={refreshHistory}
-          className="self-start rounded-full border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
+          className="self-start rounded-full border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50 dark:border-orange-400/30 dark:text-orange-300 dark:hover:bg-orange-400/10"
         >
           {isLoading ? '同步中...' : '刷新'}
         </button>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-orange-50 px-4 py-3">
-          <p className="text-xs text-orange-500">累计专注</p>
-          <p className="mt-1 text-lg font-bold text-orange-950">{formatDuration(totalSeconds)}</p>
+        <div className="rounded-2xl bg-orange-50 px-4 py-3 dark:bg-orange-400/10">
+          <p className="text-xs text-orange-500 dark:text-orange-300">累计专注</p>
+          <p className="mt-1 text-lg font-bold text-orange-950 dark:text-orange-50">{formatDuration(totalSeconds)}</p>
         </div>
-        <div className="rounded-2xl bg-red-50 px-4 py-3">
-          <p className="text-xs text-red-500">完成番茄</p>
-          <p className="mt-1 text-lg font-bold text-red-950">{completedCount} 个</p>
+        <div className="rounded-2xl bg-red-50 px-4 py-3 dark:bg-red-400/10">
+          <p className="text-xs text-red-500 dark:text-red-300">完成番茄</p>
+          <p className="mt-1 text-lg font-bold text-red-950 dark:text-red-50">{completedCount} 个</p>
         </div>
-        <div className="rounded-2xl bg-amber-50 px-4 py-3">
-          <p className="text-xs text-amber-600">当前年份</p>
-          <p className="mt-1 text-lg font-bold text-amber-950">{year}</p>
+        <div className="rounded-2xl bg-amber-50 px-4 py-3 dark:bg-amber-400/10">
+          <p className="text-xs text-amber-600 dark:text-amber-300">当前年份</p>
+          <p className="mt-1 text-lg font-bold text-amber-950 dark:text-amber-50">{year}</p>
         </div>
       </div>
 
       {error && (
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200">
           暂时连不上 Cloudflare D1，页面会继续使用本地番茄计数：{error}
         </div>
       )}
 
       <div className="mt-5 overflow-x-auto pb-2">
         <div className="min-w-[760px]">
-          <div className="mb-2 grid grid-cols-12 text-xs font-semibold text-gray-400">
+          <div className="mb-2 grid grid-cols-12 text-xs font-semibold text-gray-400 dark:text-slate-500">
             {monthLabels.map(label => (
               <span key={label}>{label}</span>
             ))}
@@ -157,7 +157,7 @@ function PomodoroHeatmap() {
               )
             ))}
           </div>
-          <div className="mt-3 flex items-center justify-end gap-2 text-xs text-gray-400">
+          <div className="mt-3 flex items-center justify-end gap-2 text-xs text-gray-400 dark:text-slate-500">
             <span>少</span>
             {[0, 1, 2, 3, 4].map(level => (
               <span

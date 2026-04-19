@@ -1,4 +1,5 @@
 const SESSION_COOKIE_NAME = "lguide_session";
+const AUTHORIZATION_PREFIX = "Bearer ";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 const PASSWORD_ITERATIONS = 100000;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_-]{3,24}$/;
@@ -69,7 +70,7 @@ export default {
     // Basic CORS for browser access from Pages/custom domain
     const defaultHeaders = {
       "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
       ...corsHeaders,
     };
 
@@ -177,6 +178,7 @@ export default {
           {
             ok: true,
             user: serializeUser(user),
+            session_token: sessionCookie,
             request_id: requestId,
           },
           201,
@@ -234,6 +236,7 @@ export default {
               created_at: user.created_at,
               last_seen_at: now,
             }),
+            session_token: sessionToken,
             request_id: requestId,
           },
           200,
@@ -575,6 +578,15 @@ function getCookieValue(request, name) {
   return "";
 }
 
+function getBearerToken(request) {
+  const authorization = request.headers.get("Authorization") || "";
+  if (!authorization.startsWith(AUTHORIZATION_PREFIX)) {
+    return "";
+  }
+
+  return authorization.slice(AUTHORIZATION_PREFIX.length).trim();
+}
+
 function buildSessionCookie(token, request) {
   const url = new URL(request.url);
   const parts = [
@@ -633,7 +645,7 @@ async function createAuthSession(env, userId) {
 }
 
 async function getAuthenticatedSession(request, env) {
-  const sessionToken = getCookieValue(request, SESSION_COOKIE_NAME);
+  const sessionToken = getBearerToken(request) || getCookieValue(request, SESSION_COOKIE_NAME);
   if (!sessionToken) return null;
 
   const sessionTokenHash = await sha256(sessionToken);

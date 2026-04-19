@@ -1,4 +1,7 @@
+import { load, save } from './storage'
+
 const PRODUCTION_API_BASE = 'https://lguide-pomodoro-api.zhuan0140.workers.dev'
+const SESSION_TOKEN_KEY = 'pomodoroSessionToken'
 const API_BASE = (
   import.meta.env.VITE_POMODORO_API_BASE
   || (import.meta.env.DEV ? '' : PRODUCTION_API_BASE)
@@ -7,6 +10,19 @@ const LOCAL_API_HINT = '本地未连接番茄钟 Worker API。请在 worker/ 目
 
 function getApiUrl(path) {
   return `${API_BASE}${path}`
+}
+
+function getSessionToken() {
+  return load(SESSION_TOKEN_KEY, '') || ''
+}
+
+export function savePomodoroSessionToken(token) {
+  if (token) {
+    save(SESSION_TOKEN_KEY, token)
+    return
+  }
+
+  localStorage.removeItem(SESSION_TOKEN_KEY)
 }
 
 function getRequestErrorMessage(status, fallbackMessage) {
@@ -25,11 +41,13 @@ async function request(path, options = {}) {
   let response
 
   try {
+    const sessionToken = getSessionToken()
     response = await fetch(getApiUrl(path), {
       credentials: 'include',
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
         ...options.headers,
       },
     })

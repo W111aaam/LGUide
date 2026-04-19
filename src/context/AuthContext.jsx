@@ -4,6 +4,7 @@ import {
   loginPomodoroUser,
   logoutPomodoroUser,
   registerPomodoroUser,
+  savePomodoroSessionToken,
 } from '../utils/pomodoroApi'
 
 const AuthContext = createContext(null)
@@ -18,6 +19,10 @@ export function AuthProvider({ children }) {
       const data = await fetchPomodoroAuthSession()
       setUser(data.authenticated ? data.user : null)
       return data.authenticated ? data.user : null
+    } catch {
+      savePomodoroSessionToken('')
+      setUser(null)
+      return null
     } finally {
       setIsLoading(false)
     }
@@ -29,18 +34,21 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(async ({ username, password }) => {
     const data = await registerPomodoroUser({ username, password })
+    savePomodoroSessionToken(data.session_token || '')
     setUser(data.user)
     return data.user
   }, [])
 
   const login = useCallback(async ({ username, password }) => {
     const data = await loginPomodoroUser({ username, password })
+    savePomodoroSessionToken(data.session_token || '')
     setUser(data.user)
     return data.user
   }, [])
 
   const logout = useCallback(async () => {
     await logoutPomodoroUser()
+    savePomodoroSessionToken('')
     setUser(null)
   }, [])
 

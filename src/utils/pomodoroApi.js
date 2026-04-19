@@ -1,5 +1,3 @@
-const USER_ID_KEY = 'lguide_user_id'
-
 const API_BASE = (import.meta.env.VITE_POMODORO_API_BASE || '').replace(/\/$/, '')
 const LOCAL_API_HINT = '本地未连接番茄钟 Worker API。请在 worker/ 目录运行 npx wrangler dev --port 8787，或设置 VITE_POMODORO_API_BASE 指向已部署的 Worker。'
 
@@ -14,20 +12,12 @@ function getRequestErrorMessage(status, fallbackMessage) {
   return fallbackMessage
 }
 
-export function getPomodoroUserId() {
-  let userId = localStorage.getItem(USER_ID_KEY)
-  if (!userId) {
-    userId = crypto.randomUUID()
-    localStorage.setItem(USER_ID_KEY, userId)
-  }
-  return userId
-}
-
 async function request(path, options = {}) {
   let response
 
   try {
     response = await fetch(getApiUrl(path), {
+      credentials: 'include',
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -45,19 +35,35 @@ async function request(path, options = {}) {
   return data
 }
 
-export function touchPomodoroUser(userId) {
-  return request('/api/user', {
+export function fetchPomodoroAuthSession() {
+  return request('/api/auth/session')
+}
+
+export function registerPomodoroUser({ username, password }) {
+  return request('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ user_id: userId }),
+    body: JSON.stringify({ username, password }),
   })
 }
 
-export function savePomodoroSession({ userId, startedAt, endedAt, durationSeconds }) {
+export function loginPomodoroUser({ username, password }) {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  })
+}
+
+export function logoutPomodoroUser() {
+  return request('/api/auth/logout', {
+    method: 'POST',
+  })
+}
+
+export function savePomodoroSession({ startedAt, endedAt, durationSeconds }) {
   return request('/api/session', {
     method: 'POST',
     body: JSON.stringify({
       id: crypto.randomUUID(),
-      user_id: userId,
       started_at: startedAt,
       ended_at: endedAt,
       duration_seconds: durationSeconds,
@@ -66,12 +72,11 @@ export function savePomodoroSession({ userId, startedAt, endedAt, durationSecond
   })
 }
 
-export function fetchPomodoroHeatmap(userId, year = new Date().getFullYear()) {
-  const params = new URLSearchParams({ user_id: userId, year: String(year) })
+export function fetchPomodoroHeatmap(year = new Date().getFullYear()) {
+  const params = new URLSearchParams({ year: String(year) })
   return request(`/api/heatmap?${params.toString()}`)
 }
 
-export function fetchPomodoroStats(userId) {
-  const params = new URLSearchParams({ user_id: userId })
-  return request(`/api/stats?${params.toString()}`)
+export function fetchPomodoroStats() {
+  return request('/api/stats')
 }

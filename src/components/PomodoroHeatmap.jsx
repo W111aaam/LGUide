@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   fetchPomodoroHeatmap,
   fetchPomodoroStats,
-  getPomodoroUserId,
-  touchPomodoroUser,
 } from '../utils/pomodoroApi'
 
 function buildYearDays(year) {
@@ -34,7 +32,6 @@ function formatDuration(seconds) {
 }
 
 function PomodoroHeatmap() {
-  const [userId] = useState(() => getPomodoroUserId())
   const [days, setDays] = useState([])
   const [stats, setStats] = useState(null)
   const [error, setError] = useState('')
@@ -44,10 +41,9 @@ function PomodoroHeatmap() {
   const refreshHistory = useCallback(async () => {
     setIsLoading(true)
     try {
-      await touchPomodoroUser(userId)
       const [heatmap, remoteStats] = await Promise.all([
-        fetchPomodoroHeatmap(userId, year),
-        fetchPomodoroStats(userId),
+        fetchPomodoroHeatmap(year),
+        fetchPomodoroStats(),
       ])
       setDays(heatmap.days || [])
       setStats(remoteStats)
@@ -57,7 +53,7 @@ function PomodoroHeatmap() {
     } finally {
       setIsLoading(false)
     }
-  }, [userId, year])
+  }, [year])
 
   useEffect(() => {
     refreshHistory()

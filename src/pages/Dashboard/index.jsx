@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PomodoroHeatmap from '../../components/PomodoroHeatmap'
+import { useAuth } from '../../context/AuthContext'
 import { load } from '../../utils/storage'
+import { fetchPomodoroHeatmap } from '../../utils/pomodoroApi'
 
 function getTodayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -41,16 +44,21 @@ function QuickLink({ to, label }) {
 }
 
 function Dashboard() {
+  const { user } = useAuth()
   const todayStr = getTodayStr()
   const currentTime = getCurrentTime()
   const assignments = load('assignments', [])
   const courses = load('courses', [])
   const pomodoroStats = load('pomodoroStats', null)
+  const [todayFocus, setTodayFocus] = useState(() => ({
+    count: pomodoroStats?.date === todayStr ? pomodoroStats.count : 0,
+    minutes: (pomodoroStats?.date === todayStr ? pomodoroStats.count : 0) * 25,
+  }))
 
   const todayDueCount = assignments.filter(a => a.dueDate === todayStr).length
   const pendingCount = assignments.filter(a => !a.done).length
-  const todayTomato = pomodoroStats?.date === todayStr ? pomodoroStats.count : 0
-  const todayFocusMinutes = todayTomato * 25
+  const todayTomato = todayFocus.count
+  const todayFocusMinutes = todayFocus.minutes
 
   const todayIndex = new Date().getDay()
   const currentMinutes = parseTimeToMinutes(currentTime)
@@ -63,6 +71,32 @@ function Dashboard() {
   const nextCourse = todayCourses.find(
     c => parseTimeToMinutes(c.startTime) > currentMinutes
   )
+
+  useEffect(() => {
+    let isCancelled = false
+
+    async function syncTodayFocus() {
+      try {
+        const heatmap = await fetchPomodoroHeatmap(new Date().getFullYear())
+        if (isCancelled) return
+        const todayEntry = (heatmap.days || []).find(day => day.date === todayStr)
+        setTodayFocus({
+          count: Number(todayEntry?.completed_count || 0),
+          minutes: Math.round(Number(todayEntry?.total_seconds || 0) / 60),
+        })
+      } catch {
+        // keep local fallback stats when remote sync is temporarily unavailable
+      }
+    }
+
+    if (user) {
+      syncTodayFocus()
+    }
+
+    return () => {
+      isCancelled = true
+    }
+  }, [todayStr, user])
 
   return (
     <div className="space-y-6">

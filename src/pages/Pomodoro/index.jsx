@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { forceCollide, forceSimulation } from 'd3-force'
 import { load, save } from '../../utils/storage'
-import { getPomodoroUserId, savePomodoroSession } from '../../utils/pomodoroApi'
+import { savePomodoroSession } from '../../utils/pomodoroApi'
 
 // 时长常量（后续可由设置页写入 localStorage 后读取）
 const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
@@ -194,7 +194,6 @@ function Pomodoro() {
   const [todayCount, setTodayCount] = useState(() => loadTodayCount())
   const [notification, setNotification] = useState(null)
   const [tomatoNodes, setTomatoNodes] = useState(() => createSettledTomatoes(loadTodayCount()))
-  const [userId] = useState(() => getPomodoroUserId())
 
   const tomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
 
@@ -310,7 +309,6 @@ function Pomodoro() {
         return next
       })
       savePomodoroSession({
-        userId,
         startedAt: startedAt.toISOString(),
         endedAt: endedAt.toISOString(),
         durationSeconds: focusMinutes * 60,
@@ -325,7 +323,7 @@ function Pomodoro() {
       setTimeLeft(focusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, focusMinutes, userId])
+  }, [timeLeft, status, mode, focusMinutes])
 
   function showNotification(msg) {
     setNotification(msg)

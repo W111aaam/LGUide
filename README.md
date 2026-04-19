@@ -29,6 +29,19 @@ npm run dev
 
 浏览器访问 `http://localhost:5173`
 
+如果你要在本地联调番茄钟 Cloudflare Worker + D1 API，需要额外启动 Worker：
+
+```bash
+cd worker
+npx wrangler dev --port 8787
+```
+
+根目录的 Vite 开发服务器已经把 `/api/*` 代理到 `http://127.0.0.1:8787`。如果你的 Worker 跑在别的地址，可以设置环境变量：
+
+```bash
+VITE_POMODORO_API_PROXY_TARGET=http://127.0.0.1:8788 npm run dev
+```
+
 ## 构建与部署
 
 ```bash

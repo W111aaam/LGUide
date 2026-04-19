@@ -2,6 +2,9 @@ name = "lguide-pomodoro-api"
 main = "src/index.js"
 compatibility_date = "2026-04-18"
 workers_dev = true
+routes = [
+	{ pattern = "lguide.net/api/*", zone_name = "lguide.net" }
+]
 
 [[d1_databases]]
 binding = "DB"

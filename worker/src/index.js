@@ -1,7 +1,36 @@
+const SCHEMA_STATEMENTS = [
+  `
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      created_at TEXT NOT NULL,
+      last_seen_at TEXT NOT NULL
+    )
+  `,
+  `
+    CREATE TABLE IF NOT EXISTS pomodoro_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      started_at TEXT NOT NULL,
+      ended_at TEXT NOT NULL,
+      duration_seconds INTEGER NOT NULL,
+      completed INTEGER NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `,
+  `
+    CREATE INDEX IF NOT EXISTS idx_sessions_user_started_at
+    ON pomodoro_sessions(user_id, started_at)
+  `,
+];
+
+let schemaReadyPromise = null;
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
+    const requestId = crypto.randomUUID();
 
     // Basic CORS for browser access from Pages/custom domain
     const corsHeaders = {
@@ -15,15 +44,123 @@ export default {
     }
 
     try {
+      const logContext = {
+        requestId,
+        method: request.method,
+        pathname: path,
+        hasDB: !!env.DB,
+      };
+      console.log("[request]", JSON.stringify(logContext));
+
+      if (!env.DB) {
+        console.error("[request] missing DB binding", JSON.stringify(logContext));
+        return json(
+          {
+            error: "D1 binding unavailable",
+            request_id: requestId,
+            has_db: false,
+          },
+          500,
+          corsHeaders,
+        );
+      }
+
+      await ensureSchema(env, requestId);
+
+      if (path === "/api/ping" && request.method === "GET") {
+        const result = await env.DB.prepare("SELECT 1 AS ok").first();
+        console.log("[ping]", JSON.stringify({ requestId, result }));
+        return json(
+          {
+            ok: true,
+            service: "pomodoro-api",
+            db: result || { ok: 1 },
+            request_id: requestId,
+          },
+          200,
+          corsHeaders,
+        );
+      }
+
       if (path === "/api/health" && request.method === "GET") {
-        return json({ ok: true, service: "pomodoro-api" }, 200, corsHeaders);
+        return json({ ok: true, service: "pomodoro-api", request_id: requestId }, 200, corsHeaders);
+      }
+
+      if (path === "/api/user" && request.method === "GET") {
+        const userId = String(url.searchParams.get("user_id") || "").trim();
+        console.log("[user.get]", JSON.stringify({ requestId, pathname: path, userId, hasDB: !!env.DB }));
+
+        if (!userId) {
+          return json(
+            {
+              error: "user_id is required",
+              accepted_via: "query string",
+              example: "/api/user?user_id=<uuid>",
+              request_id: requestId,
+            },
+            400,
+            corsHeaders,
+          );
+        }
+
+        const user = await env.DB.prepare(`
+          SELECT id, created_at, last_seen_at
+          FROM users
+          WHERE id = ?1
+          LIMIT 1
+        `)
+          .bind(userId)
+          .first();
+
+        if (!user) {
+          return json(
+            {
+              ok: false,
+              user_id: userId,
+              found: false,
+              request_id: requestId,
+            },
+            404,
+            corsHeaders,
+          );
+        }
+
+        return json(
+          {
+            ok: true,
+            found: true,
+            user,
+            request_id: requestId,
+          },
+          200,
+          corsHeaders,
+        );
       }
 
       if (path === "/api/user" && request.method === "POST") {
         const body = await request.json().catch(() => ({}));
-        const userId = String(body.user_id || "").trim();
+        const userId = String(body.user_id || body.userId || body.id || "").trim();
+        console.log(
+          "[user.post]",
+          JSON.stringify({
+            requestId,
+            pathname: path,
+            hasDB: !!env.DB,
+            body,
+            resolvedUserId: userId,
+          }),
+        );
+
         if (!userId) {
-          return json({ error: "user_id is required" }, 400, corsHeaders);
+          return json(
+            {
+              error: "user_id is required",
+              accepted_fields: ["user_id", "userId", "id"],
+              request_id: requestId,
+            },
+            400,
+            corsHeaders,
+          );
         }
 
         const now = new Date().toISOString();
@@ -37,7 +174,7 @@ export default {
 
         await cacheUser(env, userId, { id: userId, last_seen_at: now });
 
-        return json({ ok: true, user_id: userId }, 200, corsHeaders);
+        return json({ ok: true, user_id: userId, request_id: requestId }, 200, corsHeaders);
       }
 
       if (path === "/api/session" && request.method === "POST") {
@@ -163,7 +300,28 @@ export default {
 
       return json({ error: "Not found" }, 404, corsHeaders);
     } catch (error) {
-      return json({ error: error.message || "Internal error" }, 500, corsHeaders);
+      console.error(
+        "[request.error]",
+        JSON.stringify({
+          requestId,
+          method: request.method,
+          pathname: path,
+          message: error?.message || "Internal error",
+          stack: error?.stack || null,
+          hasDB: !!env.DB,
+        }),
+      );
+      return json(
+        {
+          error: error.message || "Internal error",
+          request_id: requestId,
+          pathname: path,
+          method: request.method,
+          has_db: !!env.DB,
+        },
+        500,
+        corsHeaders,
+      );
     }
   },
 };
@@ -181,4 +339,30 @@ function json(data, status = 200, extraHeaders = {}) {
 async function cacheUser(env, userId, payload) {
   if (!env.USER_CACHE) return;
   await env.USER_CACHE.put(`user:${userId}`, JSON.stringify(payload), { expirationTtl: 60 * 60 * 24 * 30 });
+}
+
+async function ensureSchema(env, requestId) {
+  if (schemaReadyPromise) {
+    await schemaReadyPromise;
+    return;
+  }
+
+  schemaReadyPromise = env.DB.batch(SCHEMA_STATEMENTS.map((statement) => env.DB.prepare(statement)))
+    .then(() => {
+      console.log("[schema.ready]", JSON.stringify({ requestId }));
+    })
+    .catch((error) => {
+      schemaReadyPromise = null;
+      console.error(
+        "[schema.error]",
+        JSON.stringify({
+          requestId,
+          message: error?.message || "Failed to initialize schema",
+          stack: error?.stack || null,
+        }),
+      );
+      throw error;
+    });
+
+  await schemaReadyPromise;
 }

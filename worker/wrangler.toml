@@ -4,7 +4,7 @@ compatibility_date = "2026-04-18"
 workers_dev = true
 
 [[d1_databases]]
-binding = "pomodoro_db"
+binding = "DB"
 database_name = "pomodoro-db"
 database_id = "6d9076df-c2b0-447a-a10c-500887e3e0b7"
 

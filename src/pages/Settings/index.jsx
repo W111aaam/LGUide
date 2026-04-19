@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { load, save } from '../../utils/storage'
 import { getStoredTheme, saveTheme, THEMES } from '../../utils/theme'
+import { isPomodoroSessionLocked } from '../../utils/pomodoroSession'
 
 const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
 const DEFAULT_FOCUS_MINUTES = 25
@@ -42,8 +43,30 @@ function Settings() {
   )
   const [focusInputValue, setFocusInputValue] = useState(() => String(focusMinutes))
   const [theme, setTheme] = useState(() => getStoredTheme())
+  const [timerNotice, setTimerNotice] = useState('')
+  const timerNoticeTimeoutRef = useRef(null)
+
+  useEffect(() => () => {
+    if (timerNoticeTimeoutRef.current) {
+      window.clearTimeout(timerNoticeTimeoutRef.current)
+    }
+  }, [])
+
+  function showTimerNotice() {
+    setTimerNotice('您正在计时')
+    if (timerNoticeTimeoutRef.current) {
+      window.clearTimeout(timerNoticeTimeoutRef.current)
+    }
+    timerNoticeTimeoutRef.current = window.setTimeout(() => setTimerNotice(''), 2400)
+  }
 
   function commitFocusMinutes(rawValue) {
+    if (isPomodoroSessionLocked()) {
+      setFocusInputValue(String(focusMinutes))
+      showTimerNotice()
+      return
+    }
+
     const next = normalizeFocusMinutes(rawValue)
     setFocusMinutes(next)
     setFocusInputValue(String(next))
@@ -111,6 +134,11 @@ function Settings() {
           description="单次专注时间（分钟）"
           badge={`${focusMinutes} 分钟`}
         >
+          {timerNotice && (
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200">
+              {timerNotice}
+            </div>
+          )}
           <div className="w-full mt-3 flex items-center gap-3">
             <input
               type="range"
@@ -128,7 +156,14 @@ function Settings() {
                 min={MIN_FOCUS_MINUTES}
                 max={MAX_FOCUS_MINUTES}
                 value={focusInputValue}
-                onChange={e => setFocusInputValue(e.target.value)}
+                onChange={e => {
+                  if (isPomodoroSessionLocked()) {
+                    setFocusInputValue(String(focusMinutes))
+                    showTimerNotice()
+                    return
+                  }
+                  setFocusInputValue(e.target.value)
+                }}
                 onBlur={handleFocusInputBlur}
                 onKeyDown={handleFocusInputKeyDown}
                 className="w-16 text-xs text-right text-gray-700 bg-white border border-gray-200 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-orange-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"

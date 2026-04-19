@@ -3,6 +3,10 @@ import { forceCollide, forceSimulation } from 'd3-force'
 import { useAuth } from '../../context/AuthContext'
 import { load, save } from '../../utils/storage'
 import { savePomodoroSession } from '../../utils/pomodoroApi'
+import {
+  loadPomodoroTimerSession,
+  savePomodoroTimerSession,
+} from '../../utils/pomodoroSession'
 
 // 时长常量（后续可由设置页写入 localStorage 后读取）
 const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
@@ -12,7 +16,6 @@ const MAX_FOCUS_MINUTES = 120
 const BREAK_MINUTES = 5
 
 const STATS_KEY = 'pomodoroStats'
-const TIMER_SESSION_KEY = 'pomodoroTimerSession'
 const TOMATO_SCENE = {
   width: 960,
   height: 680,
@@ -98,6 +101,9 @@ function createSettledTomatoes(count, emojiFontSizes = []) {
       squashPhase: 0,
       state: 'settled',
       emojiFontSize,
+      persistAfterReset: true,
+      removableOnReset: false,
+      completedAt: new Date().toISOString(),
     }
   })
 }
@@ -245,18 +251,14 @@ function saveTodayCompletion(count, emojiFontSize) {
 }
 
 function loadTimerSession() {
-  const session = load(TIMER_SESSION_KEY, null)
+  const session = loadPomodoroTimerSession()
   if (!session || !['focus', 'break'].includes(session.mode)) return null
   if (!['idle', 'running', 'paused'].includes(session.status)) return null
   return session
 }
 
 function saveTimerSession(session) {
-  save(TIMER_SESSION_KEY, session)
-}
-
-function clearTimerSession() {
-  localStorage.removeItem(TIMER_SESSION_KEY)
+  savePomodoroTimerSession(session)
 }
 
 function sanitizeTomatoNode(node) {
@@ -278,6 +280,10 @@ function sanitizeTomatoNode(node) {
     emojiFontSize: node.emojiFontSize || getTomatoEmojiFontSize(DEFAULT_FOCUS_MINUTES),
     explosionProgress: node.explosionProgress || 0,
     stainFade: node.stainFade ?? 1,
+    persistAfterReset: Boolean(node.persistAfterReset),
+    removableOnReset: node.removableOnReset !== false && !node.persistAfterReset,
+    completedAt: node.completedAt || null,
+    createdAt: node.createdAt || null,
   }
 }
 
@@ -303,7 +309,15 @@ function hydrateTomatoNode(node) {
     emojiFontSize,
     explosionProgress: Number(node?.explosionProgress) || 0,
     stainFade: node?.stainFade ?? 1,
+    persistAfterReset: node?.persistAfterReset ?? node?.state === 'settled',
+    removableOnReset: node?.removableOnReset ?? node?.state !== 'settled',
+    completedAt: node?.completedAt || null,
+    createdAt: node?.createdAt || null,
   }
+}
+
+function isHistoricalTomato(node) {
+  return Boolean(node.persistAfterReset) || node.removableOnReset === false
 }
 
 function getSessionRemainingSeconds(session, now = Date.now()) {
@@ -327,37 +341,52 @@ function getInitialTimerState(focusMinutes) {
       timeLeft: fallbackSeconds,
       totalSeconds: fallbackSeconds,
       todayCount: fallbackTodayCount,
-      tomatoNodes: fallbackTomatoes,
+      completedTomatoes: fallbackTomatoes,
+      transientTomatoes: [],
       nextTomatoId: fallbackTodayCount,
       activeTomatoId: null,
       focusTomatoSpawned: false,
       focusSessionStartedAt: null,
       sessionEndAt: null,
+      sessionLocked: false,
       session: null,
     }
   }
 
+  const sessionLocked = Boolean(session.sessionLocked) || session.status === 'running' || session.status === 'paused'
   const sessionTomatoes = Array.isArray(session.tomatoes)
     ? session.tomatoes.map(hydrateTomatoNode).filter(node => !node.remove)
     : fallbackTomatoes
+  const completedTomatoes = Array.isArray(session.completedTomatoes)
+    ? session.completedTomatoes.map(hydrateTomatoNode).filter(node => !node.remove)
+    : sessionTomatoes.filter(isHistoricalTomato)
+  const transientTomatoes = Array.isArray(session.transientTomatoes)
+    ? session.transientTomatoes.map(hydrateTomatoNode).filter(node => !node.remove)
+    : sessionTomatoes.filter(node => !isHistoricalTomato(node))
   const remainingSeconds = getSessionRemainingSeconds(session)
-  const durationSeconds = Number(session.durationSeconds) || getModeDurationSeconds(session.mode, focusMinutes)
+  const durationSeconds = sessionLocked
+    ? Number(session.durationSeconds) || getModeDurationSeconds(session.mode, focusMinutes)
+    : getModeDurationSeconds(session.mode, focusMinutes)
   const safeStatus = ['running', 'paused', 'idle'].includes(session.status) ? session.status : 'idle'
 
   return {
     mode: session.mode,
     status: safeStatus,
-    timeLeft: safeStatus === 'running' ? remainingSeconds : Math.max(0, remainingSeconds || durationSeconds),
+    timeLeft: sessionLocked
+      ? (safeStatus === 'running' ? remainingSeconds : Math.max(0, remainingSeconds || durationSeconds))
+      : durationSeconds,
     totalSeconds: durationSeconds,
     todayCount: Number.isFinite(Number(session.todayCount)) ? Number(session.todayCount) : fallbackTodayCount,
-    tomatoNodes: sessionTomatoes,
+    completedTomatoes,
+    transientTomatoes,
     nextTomatoId: Number.isFinite(Number(session.nextTomatoId))
       ? Number(session.nextTomatoId)
-      : Math.max(fallbackTodayCount, sessionTomatoes.length),
-    activeTomatoId: session.activeTomatoId || sessionTomatoes.find(node => node.state === 'active')?.id || null,
+      : Math.max(fallbackTodayCount, completedTomatoes.length + transientTomatoes.length),
+    activeTomatoId: session.activeTomatoId || transientTomatoes.find(node => node.state === 'active')?.id || null,
     focusTomatoSpawned: Boolean(session.focusTomatoSpawned),
     focusSessionStartedAt: session.focusSessionStartedAt || null,
     sessionEndAt: safeStatus === 'running' ? Number(session.targetEndTime) || null : null,
+    sessionLocked,
     session,
   }
 }
@@ -366,19 +395,21 @@ function getInitialTimerState(focusMinutes) {
 
 function Pomodoro() {
   const { user } = useAuth()
-  const [focusMinutes] = useState(() =>
+  const [settingsFocusMinutes, setSettingsFocusMinutes] = useState(() =>
     normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
   )
-  const [initialTimerState] = useState(() => getInitialTimerState(focusMinutes))
+  const [initialTimerState] = useState(() => getInitialTimerState(settingsFocusMinutes))
   const [mode, setMode] = useState(initialTimerState.mode)       // 'focus' | 'break'
   const [status, setStatus] = useState(initialTimerState.status)    // 'idle' | 'running' | 'paused'
   const [timeLeft, setTimeLeft] = useState(initialTimerState.timeLeft)
   const [durationSeconds, setDurationSeconds] = useState(initialTimerState.totalSeconds)
   const [todayCount, setTodayCount] = useState(initialTimerState.todayCount)
   const [notification, setNotification] = useState(null)
-  const [tomatoNodes, setTomatoNodes] = useState(initialTimerState.tomatoNodes)
+  const [completedTomatoes, setCompletedTomatoes] = useState(initialTimerState.completedTomatoes)
+  const [transientTomatoes, setTransientTomatoes] = useState(initialTimerState.transientTomatoes)
+  const tomatoNodes = [...completedTomatoes, ...transientTomatoes]
 
-  const currentTomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
+  const currentTomatoEmojiFontSize = getTomatoEmojiFontSize(settingsFocusMinutes)
 
   const nodesRef = useRef([])
   const simulationRef = useRef(null)
@@ -396,12 +427,14 @@ function Pomodoro() {
       : null,
   )
   const sessionEndAtRef = useRef(initialTimerState.sessionEndAt)
+  const sessionLockedRef = useRef(initialTimerState.sessionLocked)
   const modeRef = useRef(initialTimerState.mode)
   const statusRef = useRef(initialTimerState.status)
   const timeLeftRef = useRef(initialTimerState.timeLeft)
   const durationSecondsRef = useRef(initialTimerState.totalSeconds)
   const todayCountRef = useRef(initialTimerState.todayCount)
-  const tomatoNodesStateRef = useRef(initialTimerState.tomatoNodes)
+  const completedTomatoesStateRef = useRef(initialTimerState.completedTomatoes)
+  const transientTomatoesStateRef = useRef(initialTimerState.transientTomatoes)
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
@@ -410,29 +443,38 @@ function Pomodoro() {
     timeLeftRef.current = timeLeft
     durationSecondsRef.current = durationSeconds
     todayCountRef.current = todayCount
-    tomatoNodesStateRef.current = tomatoNodes
-  }, [mode, status, timeLeft, durationSeconds, todayCount, tomatoNodes])
+    completedTomatoesStateRef.current = completedTomatoes
+    transientTomatoesStateRef.current = transientTomatoes
+  }, [mode, status, timeLeft, durationSeconds, todayCount, completedTomatoes, transientTomatoes])
 
   function persistTimerState(overrides = {}) {
     const snapshotMode = overrides.mode ?? modeRef.current
     const snapshotStatus = overrides.status ?? statusRef.current
     const snapshotRemaining = overrides.remainingSeconds ?? timeLeftRef.current
     const snapshotTargetEndTime = overrides.targetEndTime ?? sessionEndAtRef.current
-    const rawNodes = nodesRef.current.length > 0 ? nodesRef.current : tomatoNodesStateRef.current
+    const rawNodes = nodesRef.current.length > 0
+      ? nodesRef.current
+      : [...completedTomatoesStateRef.current, ...transientTomatoesStateRef.current]
+    const sanitizedNodes = rawNodes.map(sanitizeTomatoNode)
+    const persistedCompleted = sanitizedNodes.filter(isHistoricalTomato)
+    const persistedTransient = sanitizedNodes.filter(node => !isHistoricalTomato(node))
 
     saveTimerSession({
       date: getTodayStr(),
       mode: snapshotMode,
       status: snapshotStatus,
-      durationSeconds: overrides.durationSeconds ?? durationSecondsRef.current ?? getModeDurationSeconds(snapshotMode, focusMinutes),
+      durationSeconds: overrides.durationSeconds ?? durationSecondsRef.current ?? getModeDurationSeconds(snapshotMode, settingsFocusMinutes),
       remainingSeconds: Math.max(0, Math.ceil(Number(snapshotRemaining) || 0)),
       targetEndTime: snapshotStatus === 'running' ? snapshotTargetEndTime : null,
       focusSessionStartedAt: focusSessionStartedAtRef.current?.toISOString() || null,
       todayCount: overrides.todayCount ?? todayCountRef.current,
-      tomatoes: rawNodes.map(sanitizeTomatoNode),
+      tomatoes: sanitizedNodes,
+      completedTomatoes: persistedCompleted,
+      transientTomatoes: persistedTransient,
       nextTomatoId: nextTomatoIdRef.current,
       activeTomatoId: activeTomatoIdRef.current,
       focusTomatoSpawned: focusTomatoSpawnedRef.current,
+      sessionLocked: overrides.sessionLocked ?? sessionLockedRef.current,
     })
   }
 
@@ -440,9 +482,40 @@ function Pomodoro() {
     persistTimerState()
   }, [mode, status, timeLeft, durationSeconds, todayCount])
 
+  useEffect(() => {
+    function syncIdleSettingsDuration() {
+      if (statusRef.current !== 'idle' || sessionLockedRef.current) return
+
+      const nextFocusMinutes = normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES))
+      setSettingsFocusMinutes(nextFocusMinutes)
+
+      if (modeRef.current !== 'focus') return
+
+      const nextSeconds = nextFocusMinutes * 60
+      setDurationSeconds(nextSeconds)
+      setTimeLeft(nextSeconds)
+      persistTimerState({
+        mode: 'focus',
+        status: 'idle',
+        durationSeconds: nextSeconds,
+        remainingSeconds: nextSeconds,
+        targetEndTime: null,
+        sessionLocked: false,
+      })
+    }
+
+    syncIdleSettingsDuration()
+    window.addEventListener('focus', syncIdleSettingsDuration)
+    window.addEventListener('storage', syncIdleSettingsDuration)
+    return () => {
+      window.removeEventListener('focus', syncIdleSettingsDuration)
+      window.removeEventListener('storage', syncIdleSettingsDuration)
+    }
+  }, [])
+
 
   useEffect(() => {
-    nodesRef.current = tomatoNodes.map(node => ({ ...node }))
+    nodesRef.current = [...completedTomatoesStateRef.current, ...transientTomatoesStateRef.current].map(node => ({ ...node }))
 
     const simulation = forceSimulation(nodesRef.current)
       .alphaDecay(0)
@@ -486,7 +559,16 @@ function Pomodoro() {
 
           // 再次过滤掉新标记为 remove 的节点
           const finalRenderedNodes = nodesRef.current.filter(node => !node.remove)
-          setTomatoNodes(finalRenderedNodes.map(node => ({ ...node })))
+          setCompletedTomatoes(
+            finalRenderedNodes
+              .filter(isHistoricalTomato)
+              .map(node => ({ ...node })),
+          )
+          setTransientTomatoes(
+            finalRenderedNodes
+              .filter(node => !isHistoricalTomato(node))
+              .map(node => ({ ...node })),
+          )
 
           // stop when nothing is moving; restart on spawn/drag
           const hasMoving = nodesRef.current.some(
@@ -537,7 +619,7 @@ function Pomodoro() {
 
     if (mode === 'focus') {
       const endedAt = new Date()
-      const startedAt = focusSessionStartedAtRef.current || new Date(endedAt.getTime() - focusMinutes * 60 * 1000)
+      const startedAt = focusSessionStartedAtRef.current || new Date(endedAt.getTime() - durationSeconds * 1000)
       focusSessionStartedAtRef.current = null
       const completedEmojiFontSize = settleActiveTomato() || currentTomatoEmojiFontSize
       focusTomatoSpawnedRef.current = false
@@ -550,7 +632,7 @@ function Pomodoro() {
         savePomodoroSession({
           startedAt: startedAt.toISOString(),
           endedAt: endedAt.toISOString(),
-          durationSeconds: focusMinutes * 60,
+          durationSeconds,
         })
           .catch(error => showNotification(`番茄已完成，但云端保存失败：${error.message || '未知错误'}`))
       }
@@ -561,11 +643,11 @@ function Pomodoro() {
     } else {
       focusTomatoSpawnedRef.current = false
       setMode('focus')
-      setTimeLeft(focusMinutes * 60)
-      setDurationSeconds(focusMinutes * 60)
+      setTimeLeft(settingsFocusMinutes * 60)
+      setDurationSeconds(settingsFocusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, focusMinutes, user, currentTomatoEmojiFontSize])
+  }, [timeLeft, status, mode, durationSeconds, settingsFocusMinutes, user, currentTomatoEmojiFontSize])
 
   function showNotification(msg) {
     setNotification(msg)
@@ -602,10 +684,14 @@ function Pomodoro() {
       squashPhase: 0,
       state: 'active',
       emojiFontSize: currentTomatoEmojiFontSize,
+      persistAfterReset: false,
+      removableOnReset: true,
+      createdAt: new Date().toISOString(),
     }
 
     activeTomatoIdRef.current = id
     nodesRef.current = [...nodesRef.current, nextNode]
+    setTransientTomatoes(prev => [...prev, { ...nextNode }])
     refreshSimulation(0.95)
   }
 
@@ -637,8 +723,13 @@ function Pomodoro() {
     activeNode.opacity = 1
     activeNode.squashPhase = 0.12
     activeNode.emojiFontSize = completedEmojiFontSize
+    activeNode.persistAfterReset = true
+    activeNode.removableOnReset = false
+    activeNode.completedAt = new Date().toISOString()
 
     activeTomatoIdRef.current = null
+    setCompletedTomatoes(prev => [...prev, { ...activeNode }])
+    setTransientTomatoes(prev => prev.filter(node => node.id !== activeNode.id))
     refreshSimulation(0.32)
     return completedEmojiFontSize
   }
@@ -649,6 +740,10 @@ function Pomodoro() {
 
     const activeNode = nodesRef.current.find(node => node.id === activeId)
     if (!activeNode) {
+      activeTomatoIdRef.current = null
+      return
+    }
+    if (isHistoricalTomato(activeNode)) {
       activeTomatoIdRef.current = null
       return
     }
@@ -670,6 +765,10 @@ function Pomodoro() {
       activeTomatoIdRef.current = null
       return
     }
+    if (isHistoricalTomato(activeNode)) {
+      activeTomatoIdRef.current = null
+      return
+    }
 
     activeNode.state = 'exploding'
     activeNode.vx *= 0.08
@@ -682,6 +781,35 @@ function Pomodoro() {
     activeNode.squashPhase = 0.16
 
     activeTomatoIdRef.current = null
+    refreshSimulation(0.6)
+  }
+
+  function cancelActiveSessionTomato() {
+    const activeId = activeTomatoIdRef.current
+    if (!activeId) return
+
+    const activeNode = nodesRef.current.find(node => node.id === activeId)
+    if (!activeNode) {
+      activeTomatoIdRef.current = null
+      return
+    }
+
+    if (!isHistoricalTomato(activeNode)) {
+      activeNode.state = 'exploding'
+      activeNode.vx *= 0.08
+      activeNode.vy *= 0.08
+      activeNode.fx = null
+      activeNode.fy = null
+      activeNode.explosionProgress = 0
+      activeNode.burstScale = 0.9
+      activeNode.opacity = 1
+      activeNode.squashPhase = 0.16
+      activeNode.removeAfterExplosion = true
+    }
+
+    activeTomatoIdRef.current = null
+    setCompletedTomatoes(nodesRef.current.filter(isHistoricalTomato).map(node => ({ ...node })))
+    setTransientTomatoes(nodesRef.current.filter(node => !isHistoricalTomato(node)).map(node => ({ ...node })))
     refreshSimulation(0.6)
   }
 
@@ -761,7 +889,7 @@ function Pomodoro() {
   function handleStart() {
     const nextDuration = status === 'paused'
       ? durationSeconds
-      : getModeDurationSeconds(mode, focusMinutes)
+      : getModeDurationSeconds(mode, settingsFocusMinutes)
     const nextRemaining = status === 'paused'
       ? timeLeft
       : nextDuration
@@ -775,6 +903,7 @@ function Pomodoro() {
       focusTomatoSpawnedRef.current = true
     }
     sessionEndAtRef.current = targetEndTime
+    sessionLockedRef.current = true
     setDurationSeconds(nextDuration)
     setTimeLeft(nextRemaining)
     setStatus('running')
@@ -783,6 +912,7 @@ function Pomodoro() {
       durationSeconds: nextDuration,
       remainingSeconds: nextRemaining,
       targetEndTime,
+      sessionLocked: true,
     })
   }
 
@@ -802,20 +932,22 @@ function Pomodoro() {
 
   function handleReset() {
     sessionEndAtRef.current = null
-    if (mode === 'focus') {
-      explodeActiveTomato()
-      focusTomatoSpawnedRef.current = false
-      focusSessionStartedAtRef.current = null
-    }
-    const resetSeconds = mode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60
+    sessionLockedRef.current = false
+    cancelActiveSessionTomato()
+    focusTomatoSpawnedRef.current = false
+    focusSessionStartedAtRef.current = null
+    const resetSeconds = settingsFocusMinutes * 60
+    setMode('focus')
     setStatus('idle')
     setDurationSeconds(resetSeconds)
     setTimeLeft(resetSeconds)
     persistTimerState({
       status: 'idle',
+      mode: 'focus',
       durationSeconds: resetSeconds,
       remainingSeconds: resetSeconds,
       targetEndTime: null,
+      sessionLocked: false,
     })
   }
 
@@ -831,7 +963,7 @@ function Pomodoro() {
       focusTomatoSpawnedRef.current = false
       focusSessionStartedAtRef.current = null
     }
-    const nextSeconds = newMode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60
+    const nextSeconds = newMode === 'focus' ? settingsFocusMinutes * 60 : BREAK_MINUTES * 60
     setMode(newMode)
     setStatus('idle')
     setDurationSeconds(nextSeconds)

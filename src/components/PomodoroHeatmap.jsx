@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import {
   fetchPomodoroHeatmap,
@@ -32,13 +32,52 @@ function formatDuration(seconds) {
   return `${hours} 小时 ${minutes} 分钟`
 }
 
+const TOOLTIP_SIZE = {
+  width: 132,
+  height: 82,
+  gap: 10,
+  padding: 8,
+}
+
 function PomodoroHeatmap() {
   const { user } = useAuth()
+  const sectionRef = useRef(null)
   const [days, setDays] = useState([])
   const [stats, setStats] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [tooltip, setTooltip] = useState(null)
   const year = new Date().getFullYear()
+
+  function showTooltip(cell, target) {
+    const section = sectionRef.current
+    if (!section || !target) return
+
+    const cellRect = target.getBoundingClientRect()
+    const sectionRect = section.getBoundingClientRect()
+    const { width, height, gap, padding } = TOOLTIP_SIZE
+
+    let x = cellRect.left - sectionRect.left + cellRect.width / 2 - width / 2
+    let y = cellRect.top - sectionRect.top - height - gap
+    let placement = 'top'
+
+    const maxX = Math.max(padding, sectionRect.width - width - padding)
+    x = Math.min(Math.max(x, padding), maxX)
+
+    if (y < padding) {
+      y = cellRect.bottom - sectionRect.top + gap
+      placement = 'bottom'
+    }
+
+    setTooltip({
+      date: cell.date,
+      minutes: cell.minutes,
+      count: cell.count,
+      x,
+      y,
+      placement,
+    })
+  }
 
   const refreshHistory = useCallback(async () => {
     if (!user) {
@@ -96,7 +135,10 @@ function PomodoroHeatmap() {
   const completedCount = stats?.totals?.completed_count || 0
 
   return (
-    <section className="rounded-[2rem] border border-orange-100 bg-white p-5 shadow-[0_24px_70px_rgba(154,52,18,0.08)] dark:border-orange-500/20 dark:bg-slate-900/88 dark:shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6">
+    <section
+      ref={sectionRef}
+      className="relative rounded-[2rem] border border-orange-100 bg-white p-5 shadow-[0_24px_70px_rgba(154,52,18,0.08)] dark:border-orange-500/20 dark:bg-slate-900/88 dark:shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-6"
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-orange-400">Tomato Heatmap</p>
@@ -156,9 +198,14 @@ function PomodoroHeatmap() {
               ) : (
                 <span
                   key={cell.id}
-                  title={`${cell.date}: ${cell.minutes} 分钟，${cell.count} 个番茄`}
+                  aria-label={`${cell.date}，${cell.minutes} 分钟，${cell.count} 个番茄`}
+                  tabIndex={0}
+                  onMouseEnter={event => showTooltip(cell, event.currentTarget)}
+                  onMouseLeave={() => setTooltip(null)}
+                  onFocus={event => showTooltip(cell, event.currentTarget)}
+                  onBlur={() => setTooltip(null)}
                   className={[
-                    'h-3 w-3 rounded-[4px] border transition-transform hover:scale-125',
+                    'h-3 w-3 rounded-[4px] border transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-orange-300',
                     cell.level === 0 && 'border-orange-100 bg-orange-50',
                     cell.level === 1 && 'border-orange-200 bg-orange-200',
                     cell.level === 2 && 'border-orange-300 bg-orange-400',
@@ -188,6 +235,31 @@ function PomodoroHeatmap() {
           </div>
         </div>
       </div>
+
+      {tooltip && (
+        <div
+          className="pointer-events-none absolute z-30 rounded-lg border border-black bg-white px-3 py-2 text-xs leading-relaxed text-black shadow-md dark:border-slate-500 dark:bg-slate-950 dark:text-slate-200 dark:shadow-[0_16px_40px_rgba(0,0,0,0.55)]"
+          style={{
+            width: `${TOOLTIP_SIZE.width}px`,
+            left: `${tooltip.x}px`,
+            top: `${tooltip.y}px`,
+          }}
+          role="tooltip"
+        >
+          <div className="font-semibold text-black dark:text-white">{tooltip.date}</div>
+          <div className="text-black dark:text-slate-300">{tooltip.minutes} 分钟</div>
+          <div className="text-black dark:text-slate-300">{tooltip.count} 个番茄</div>
+          <span
+            className={[
+              'absolute left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-black bg-white dark:border-slate-500 dark:bg-slate-950',
+              tooltip.placement === 'top'
+                ? '-bottom-1 border-b border-r'
+                : '-top-1 border-l border-t',
+            ].join(' ')}
+            aria-hidden="true"
+          />
+        </div>
+      )}
     </section>
   )
 }

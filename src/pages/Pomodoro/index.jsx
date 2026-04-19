@@ -12,12 +12,16 @@ const MAX_FOCUS_MINUTES = 120
 const BREAK_MINUTES = 5
 
 const STATS_KEY = 'pomodoroStats'
+const TIMER_SESSION_KEY = 'pomodoroTimerSession'
 const TOMATO_SCENE = {
   width: 960,
   height: 680,
   floorPadding: 18,
 }
 const TOMATO_RADIUS = 42
+const BASE_TOMATO_SIZE_REM = 5.8
+const MAX_TOMATO_SIZE_REM = 21
+const DEFAULT_REM_IN_PX = 16
 
 function normalizeFocusMinutes(value) {
   const parsed = Number.parseInt(String(value), 10)
@@ -29,27 +33,53 @@ function normalizeFocusMinutes(value) {
 
 function getTomatoEmojiFontSize(focusMinutes) {
   const BASE_MINUTES = 25
-  const BASE_SIZE_REM = 5.8
   const MAX_MINUTES = 120
-  const MAX_SIZE_REM = 21
   const clampedMinutes = Math.max(MIN_FOCUS_MINUTES, Math.min(MAX_MINUTES, Number(focusMinutes)))
   const minutesProgress = (clampedMinutes - BASE_MINUTES) / (MAX_MINUTES - BASE_MINUTES)
-  const size = BASE_SIZE_REM + minutesProgress * (MAX_SIZE_REM - BASE_SIZE_REM)
+  const size = BASE_TOMATO_SIZE_REM + minutesProgress * (MAX_TOMATO_SIZE_REM - BASE_TOMATO_SIZE_REM)
   return `${size.toFixed(2)}rem`
 }
 
-function createSettledTomatoes(count) {
+function getRootFontSizePx() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_REM_IN_PX
+  }
+  const parsedSize = Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize)
+  return Number.isFinite(parsedSize) ? parsedSize : DEFAULT_REM_IN_PX
+}
+
+function getTomatoVisualSizePx(emojiFontSize) {
+  const parsedSize = Number.parseFloat(String(emojiFontSize))
+  const size = Number.isFinite(parsedSize) ? parsedSize : BASE_TOMATO_SIZE_REM
+  return size * getRootFontSizePx()
+}
+
+function getTomatoPhysicsMetrics(emojiFontSize) {
+  const visualSizePx = getTomatoVisualSizePx(emojiFontSize)
+  const radius = visualSizePx / 2
+
+  return {
+    visualSizePx,
+    radius,
+    collisionRadius: radius,
+  }
+}
+
+function createSettledTomatoes(count, emojiFontSizes = []) {
   const columns = 8
   const spacingX = 88
   const spacingY = 64
   const startX = 156
-  const floorY = TOMATO_SCENE.height - TOMATO_SCENE.floorPadding - TOMATO_RADIUS
+  const fallbackEmojiFontSize = getTomatoEmojiFontSize(DEFAULT_FOCUS_MINUTES)
 
   return Array.from({ length: count }, (_, index) => {
     const row = Math.floor(index / columns)
     const column = index % columns
     const offset = row % 2 === 0 ? 0 : 26
     const x = startX + column * spacingX + offset
+    const emojiFontSize = emojiFontSizes[index] || fallbackEmojiFontSize
+    const tomatoMetrics = getTomatoPhysicsMetrics(emojiFontSize)
+    const floorY = TOMATO_SCENE.height - TOMATO_SCENE.floorPadding - tomatoMetrics.radius
     const y = floorY - row * spacingY
 
     return {
@@ -60,12 +90,14 @@ function createSettledTomatoes(count) {
       vy: 0,
       fx: x,
       fy: y,
-      radius: TOMATO_RADIUS,
-      collisionRadius: 31,
+      radius: tomatoMetrics.radius,
+      collisionRadius: tomatoMetrics.collisionRadius,
+      visualSizePx: tomatoMetrics.visualSizePx,
       rotation: (index % 2 === 0 ? -1 : 1) * (5 + (index % 3) * 2),
       opacity: 1,
       squashPhase: 0,
       state: 'settled',
+      emojiFontSize,
     }
   })
 }
@@ -106,8 +138,9 @@ function createTomatoPhysicsForce() {
         node.rotation += node.vx * 0.12
       }
 
-      const minX = node.radius
-      const maxX = TOMATO_SCENE.width - node.radius
+      const radius = node.radius || TOMATO_RADIUS
+      const minX = radius
+      const maxX = TOMATO_SCENE.width - radius
 
       if (node.x < minX) {
         node.x = minX
@@ -118,7 +151,7 @@ function createTomatoPhysicsForce() {
         node.vx = -Math.abs(node.vx) * 0.55
       }
 
-      const floorY = floor - node.radius
+      const floorY = floor - radius
       if (node.y >= floorY) {
         const impact = Math.max(Math.abs(node.vy), 2)
         node.y = floorY
@@ -174,6 +207,10 @@ function formatTime(seconds) {
   return `${m}:${s}`
 }
 
+function getModeDurationSeconds(mode, focusMinutes) {
+  return (mode === 'focus' ? focusMinutes : BREAK_MINUTES) * 60
+}
+
 function getTodayStr() {
   return new Date().toISOString().slice(0, 10) // 'YYYY-MM-DD'
 }
@@ -183,6 +220,148 @@ function loadTodayCount() {
   return stored?.date === getTodayStr() ? stored.count : 0
 }
 
+function loadTodayTomatoEmojiSizes() {
+  const stored = load(STATS_KEY, null)
+  if (stored?.date !== getTodayStr() || !Array.isArray(stored.tomatoEmojiSizes)) {
+    return []
+  }
+  return stored.tomatoEmojiSizes
+}
+
+function saveTodayCompletion(count, emojiFontSize) {
+  const date = getTodayStr()
+  const stored = load(STATS_KEY, null)
+  const isToday = stored?.date === date
+  const existingSizes = isToday && Array.isArray(stored.tomatoEmojiSizes)
+    ? stored.tomatoEmojiSizes.slice(0, Math.max(0, count - 1))
+    : []
+
+  save(STATS_KEY, {
+    ...(isToday ? stored : {}),
+    date,
+    count,
+    tomatoEmojiSizes: [...existingSizes, emojiFontSize],
+  })
+}
+
+function loadTimerSession() {
+  const session = load(TIMER_SESSION_KEY, null)
+  if (!session || !['focus', 'break'].includes(session.mode)) return null
+  if (!['idle', 'running', 'paused'].includes(session.status)) return null
+  return session
+}
+
+function saveTimerSession(session) {
+  save(TIMER_SESSION_KEY, session)
+}
+
+function clearTimerSession() {
+  localStorage.removeItem(TIMER_SESSION_KEY)
+}
+
+function sanitizeTomatoNode(node) {
+  return {
+    id: node.id,
+    x: node.x,
+    y: node.y,
+    vx: node.vx || 0,
+    vy: node.vy || 0,
+    fx: node.fx ?? null,
+    fy: node.fy ?? null,
+    radius: node.radius,
+    collisionRadius: node.collisionRadius,
+    visualSizePx: node.visualSizePx,
+    rotation: node.rotation || 0,
+    opacity: node.opacity ?? 1,
+    squashPhase: node.squashPhase || 0,
+    state: node.state === 'dragging' ? 'active' : node.state,
+    emojiFontSize: node.emojiFontSize || getTomatoEmojiFontSize(DEFAULT_FOCUS_MINUTES),
+    explosionProgress: node.explosionProgress || 0,
+    stainFade: node.stainFade ?? 1,
+  }
+}
+
+function hydrateTomatoNode(node) {
+  const emojiFontSize = node?.emojiFontSize || getTomatoEmojiFontSize(DEFAULT_FOCUS_MINUTES)
+  const tomatoMetrics = getTomatoPhysicsMetrics(emojiFontSize)
+
+  return {
+    id: String(node?.id || crypto.randomUUID()),
+    x: Number.isFinite(Number(node?.x)) ? Number(node.x) : TOMATO_SCENE.width / 2,
+    y: Number.isFinite(Number(node?.y)) ? Number(node.y) : -120,
+    vx: Number(node?.vx) || 0,
+    vy: Number(node?.vy) || 0,
+    fx: node?.fx ?? null,
+    fy: node?.fy ?? null,
+    radius: Number(node?.radius) || tomatoMetrics.radius,
+    collisionRadius: Number(node?.collisionRadius) || tomatoMetrics.collisionRadius,
+    visualSizePx: Number(node?.visualSizePx) || tomatoMetrics.visualSizePx,
+    rotation: Number(node?.rotation) || 0,
+    opacity: node?.opacity ?? 1,
+    squashPhase: Number(node?.squashPhase) || 0,
+    state: node?.state === 'dragging' ? 'active' : (node?.state || 'settled'),
+    emojiFontSize,
+    explosionProgress: Number(node?.explosionProgress) || 0,
+    stainFade: node?.stainFade ?? 1,
+  }
+}
+
+function getSessionRemainingSeconds(session, now = Date.now()) {
+  if (!session) return 0
+  if (session.status === 'paused') {
+    return Math.max(0, Number(session.remainingSeconds) || 0)
+  }
+  return Math.max(0, Math.ceil((Number(session.targetEndTime) - now) / 1000))
+}
+
+function getInitialTimerState(focusMinutes) {
+  const fallbackSeconds = getModeDurationSeconds('focus', focusMinutes)
+  const session = loadTimerSession()
+  const fallbackTodayCount = loadTodayCount()
+  const fallbackTomatoes = createSettledTomatoes(fallbackTodayCount, loadTodayTomatoEmojiSizes())
+
+  if (!session) {
+    return {
+      mode: 'focus',
+      status: 'idle',
+      timeLeft: fallbackSeconds,
+      totalSeconds: fallbackSeconds,
+      todayCount: fallbackTodayCount,
+      tomatoNodes: fallbackTomatoes,
+      nextTomatoId: fallbackTodayCount,
+      activeTomatoId: null,
+      focusTomatoSpawned: false,
+      focusSessionStartedAt: null,
+      sessionEndAt: null,
+      session: null,
+    }
+  }
+
+  const sessionTomatoes = Array.isArray(session.tomatoes)
+    ? session.tomatoes.map(hydrateTomatoNode).filter(node => !node.remove)
+    : fallbackTomatoes
+  const remainingSeconds = getSessionRemainingSeconds(session)
+  const durationSeconds = Number(session.durationSeconds) || getModeDurationSeconds(session.mode, focusMinutes)
+  const safeStatus = ['running', 'paused', 'idle'].includes(session.status) ? session.status : 'idle'
+
+  return {
+    mode: session.mode,
+    status: safeStatus,
+    timeLeft: safeStatus === 'running' ? remainingSeconds : Math.max(0, remainingSeconds || durationSeconds),
+    totalSeconds: durationSeconds,
+    todayCount: Number.isFinite(Number(session.todayCount)) ? Number(session.todayCount) : fallbackTodayCount,
+    tomatoNodes: sessionTomatoes,
+    nextTomatoId: Number.isFinite(Number(session.nextTomatoId))
+      ? Number(session.nextTomatoId)
+      : Math.max(fallbackTodayCount, sessionTomatoes.length),
+    activeTomatoId: session.activeTomatoId || sessionTomatoes.find(node => node.state === 'active')?.id || null,
+    focusTomatoSpawned: Boolean(session.focusTomatoSpawned),
+    focusSessionStartedAt: session.focusSessionStartedAt || null,
+    sessionEndAt: safeStatus === 'running' ? Number(session.targetEndTime) || null : null,
+    session,
+  }
+}
+
 // ---- 主组件 ----
 
 function Pomodoro() {
@@ -190,27 +369,76 @@ function Pomodoro() {
   const [focusMinutes] = useState(() =>
     normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
   )
-  const [mode, setMode] = useState('focus')       // 'focus' | 'break'
-  const [status, setStatus] = useState('idle')    // 'idle' | 'running' | 'paused'
-  const [timeLeft, setTimeLeft] = useState(focusMinutes * 60)
-  const [todayCount, setTodayCount] = useState(() => loadTodayCount())
+  const [initialTimerState] = useState(() => getInitialTimerState(focusMinutes))
+  const [mode, setMode] = useState(initialTimerState.mode)       // 'focus' | 'break'
+  const [status, setStatus] = useState(initialTimerState.status)    // 'idle' | 'running' | 'paused'
+  const [timeLeft, setTimeLeft] = useState(initialTimerState.timeLeft)
+  const [durationSeconds, setDurationSeconds] = useState(initialTimerState.totalSeconds)
+  const [todayCount, setTodayCount] = useState(initialTimerState.todayCount)
   const [notification, setNotification] = useState(null)
-  const [tomatoNodes, setTomatoNodes] = useState(() => createSettledTomatoes(loadTodayCount()))
+  const [tomatoNodes, setTomatoNodes] = useState(initialTimerState.tomatoNodes)
 
-  const tomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
+  const currentTomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
 
   const nodesRef = useRef([])
   const simulationRef = useRef(null)
   const animationFrameRef = useRef(null)
   const notificationTimeoutRef = useRef(null)
-  const nextTomatoIdRef = useRef(loadTodayCount())
-  const activeTomatoIdRef = useRef(null)
-  const focusTomatoSpawnedRef = useRef(false)
+  const nextTomatoIdRef = useRef(initialTimerState.nextTomatoId)
+  const activeTomatoIdRef = useRef(initialTimerState.activeTomatoId)
+  const focusTomatoSpawnedRef = useRef(initialTimerState.focusTomatoSpawned)
   const sceneRef = useRef(null)
   const prevMouseRef = useRef(null)
   const dragNodeRef = useRef(null)
-  const focusSessionStartedAtRef = useRef(null)
+  const focusSessionStartedAtRef = useRef(
+    initialTimerState.focusSessionStartedAt
+      ? new Date(initialTimerState.focusSessionStartedAt)
+      : null,
+  )
+  const sessionEndAtRef = useRef(initialTimerState.sessionEndAt)
+  const modeRef = useRef(initialTimerState.mode)
+  const statusRef = useRef(initialTimerState.status)
+  const timeLeftRef = useRef(initialTimerState.timeLeft)
+  const durationSecondsRef = useRef(initialTimerState.totalSeconds)
+  const todayCountRef = useRef(initialTimerState.todayCount)
+  const tomatoNodesStateRef = useRef(initialTimerState.tomatoNodes)
   const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    modeRef.current = mode
+    statusRef.current = status
+    timeLeftRef.current = timeLeft
+    durationSecondsRef.current = durationSeconds
+    todayCountRef.current = todayCount
+    tomatoNodesStateRef.current = tomatoNodes
+  }, [mode, status, timeLeft, durationSeconds, todayCount, tomatoNodes])
+
+  function persistTimerState(overrides = {}) {
+    const snapshotMode = overrides.mode ?? modeRef.current
+    const snapshotStatus = overrides.status ?? statusRef.current
+    const snapshotRemaining = overrides.remainingSeconds ?? timeLeftRef.current
+    const snapshotTargetEndTime = overrides.targetEndTime ?? sessionEndAtRef.current
+    const rawNodes = nodesRef.current.length > 0 ? nodesRef.current : tomatoNodesStateRef.current
+
+    saveTimerSession({
+      date: getTodayStr(),
+      mode: snapshotMode,
+      status: snapshotStatus,
+      durationSeconds: overrides.durationSeconds ?? durationSecondsRef.current ?? getModeDurationSeconds(snapshotMode, focusMinutes),
+      remainingSeconds: Math.max(0, Math.ceil(Number(snapshotRemaining) || 0)),
+      targetEndTime: snapshotStatus === 'running' ? snapshotTargetEndTime : null,
+      focusSessionStartedAt: focusSessionStartedAtRef.current?.toISOString() || null,
+      todayCount: overrides.todayCount ?? todayCountRef.current,
+      tomatoes: rawNodes.map(sanitizeTomatoNode),
+      nextTomatoId: nextTomatoIdRef.current,
+      activeTomatoId: activeTomatoIdRef.current,
+      focusTomatoSpawned: focusTomatoSpawnedRef.current,
+    })
+  }
+
+  useEffect(() => {
+    persistTimerState()
+  }, [mode, status, timeLeft, durationSeconds, todayCount])
 
 
   useEffect(() => {
@@ -220,7 +448,7 @@ function Pomodoro() {
       .alphaDecay(0)
       .alphaMin(0)
       .velocityDecay(0.12)
-      .force('collide', forceCollide().radius(node => node.collisionRadius).iterations(5))
+      .force('collide', forceCollide().radius(node => node.collisionRadius || TOMATO_RADIUS).iterations(5))
       .force('physics', createTomatoPhysicsForce())
       .on('tick', () => {
         if (animationFrameRef.current) return
@@ -273,6 +501,7 @@ function Pomodoro() {
     simulationRef.current = simulation
 
     return () => {
+      persistTimerState()
       if (notificationTimeoutRef.current) {
         clearTimeout(notificationTimeoutRef.current)
       }
@@ -287,9 +516,15 @@ function Pomodoro() {
   // Effect 1：status 为 running 时每秒递减
   useEffect(() => {
     if (status !== 'running') return
-    const id = setInterval(() => {
-      setTimeLeft(prev => Math.max(0, prev - 1))
-    }, 1000)
+
+    function syncRemainingTime() {
+      const targetEndTime = sessionEndAtRef.current
+      if (!targetEndTime) return
+      setTimeLeft(Math.max(0, Math.ceil((targetEndTime - Date.now()) / 1000)))
+    }
+
+    syncRemainingTime()
+    const id = setInterval(syncRemainingTime, 1000)
     return () => clearInterval(id)
   }, [status])
 
@@ -298,16 +533,17 @@ function Pomodoro() {
     if (status !== 'running' || timeLeft !== 0) return
 
     setStatus('idle')
+    sessionEndAtRef.current = null
 
     if (mode === 'focus') {
       const endedAt = new Date()
       const startedAt = focusSessionStartedAtRef.current || new Date(endedAt.getTime() - focusMinutes * 60 * 1000)
       focusSessionStartedAtRef.current = null
-      settleActiveTomato()
+      const completedEmojiFontSize = settleActiveTomato() || currentTomatoEmojiFontSize
       focusTomatoSpawnedRef.current = false
       setTodayCount(prev => {
         const next = prev + 1
-        save(STATS_KEY, { date: getTodayStr(), count: next })
+        saveTodayCompletion(next, completedEmojiFontSize)
         return next
       })
       if (user) {
@@ -320,14 +556,16 @@ function Pomodoro() {
       }
       setMode('break')
       setTimeLeft(BREAK_MINUTES * 60)
+      setDurationSeconds(BREAK_MINUTES * 60)
       showNotification('专注结束！去休息 5 分钟吧')
     } else {
       focusTomatoSpawnedRef.current = false
       setMode('focus')
       setTimeLeft(focusMinutes * 60)
+      setDurationSeconds(focusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, focusMinutes, user])
+  }, [timeLeft, status, mode, focusMinutes, user, currentTomatoEmojiFontSize])
 
   function showNotification(msg) {
     setNotification(msg)
@@ -349,18 +587,21 @@ function Pomodoro() {
     if (activeTomatoIdRef.current) return
 
     const id = `active-${nextTomatoIdRef.current++}`
+    const tomatoMetrics = getTomatoPhysicsMetrics(currentTomatoEmojiFontSize)
     const nextNode = {
       id,
       x: TOMATO_SCENE.width / 2 + (Math.random() - 0.5) * 24,
       y: -120,
       vx: (Math.random() - 0.5) * 2,
       vy: 0,
-      radius: TOMATO_RADIUS,
-      collisionRadius: 31,
+      radius: tomatoMetrics.radius,
+      collisionRadius: tomatoMetrics.collisionRadius,
+      visualSizePx: tomatoMetrics.visualSizePx,
       rotation: (Math.random() - 0.5) * 10,
       opacity: 1,
       squashPhase: 0,
       state: 'active',
+      emojiFontSize: currentTomatoEmojiFontSize,
     }
 
     activeTomatoIdRef.current = id
@@ -370,17 +611,22 @@ function Pomodoro() {
 
   function settleActiveTomato() {
     const activeId = activeTomatoIdRef.current
-    if (!activeId) return
+    if (!activeId) return null
 
     const activeNode = nodesRef.current.find(node => node.id === activeId)
     if (!activeNode) {
       activeTomatoIdRef.current = null
-      return
+      return null
     }
 
+    const completedEmojiFontSize = activeNode.emojiFontSize || currentTomatoEmojiFontSize
+    const tomatoMetrics = getTomatoPhysicsMetrics(completedEmojiFontSize)
     activeNode.state = 'settled'
     activeNode.vx = 0
     activeNode.vy = 0
+    activeNode.radius = activeNode.radius || tomatoMetrics.radius
+    activeNode.collisionRadius = activeNode.collisionRadius || tomatoMetrics.collisionRadius
+    activeNode.visualSizePx = activeNode.visualSizePx || tomatoMetrics.visualSizePx
     activeNode.fx = activeNode.x
     activeNode.fy = Math.min(
       activeNode.y,
@@ -390,9 +636,11 @@ function Pomodoro() {
     activeNode.y = activeNode.fy
     activeNode.opacity = 1
     activeNode.squashPhase = 0.12
+    activeNode.emojiFontSize = completedEmojiFontSize
 
     activeTomatoIdRef.current = null
     refreshSimulation(0.32)
+    return completedEmojiFontSize
   }
 
   function fadeActiveTomato() {
@@ -452,7 +700,7 @@ function Pomodoro() {
       const nx = node.fx ?? node.x
       const ny = node.fy ?? node.y
       const dist = Math.sqrt((pos.x - nx) ** 2 + (pos.y - ny) ** 2)
-      if (dist < TOMATO_RADIUS * 1.2) {
+      if (dist < (node.radius || TOMATO_RADIUS) * 1.2) {
         dragNodeRef.current = node.id
         node.state = 'dragging'
         node.fx = pos.x
@@ -511,6 +759,14 @@ function Pomodoro() {
   }
 
   function handleStart() {
+    const nextDuration = status === 'paused'
+      ? durationSeconds
+      : getModeDurationSeconds(mode, focusMinutes)
+    const nextRemaining = status === 'paused'
+      ? timeLeft
+      : nextDuration
+    const targetEndTime = Date.now() + nextRemaining * 1000
+
     if (mode === 'focus' && !focusSessionStartedAtRef.current) {
       focusSessionStartedAtRef.current = new Date()
     }
@@ -518,25 +774,54 @@ function Pomodoro() {
       spawnFallingTomato()
       focusTomatoSpawnedRef.current = true
     }
+    sessionEndAtRef.current = targetEndTime
+    setDurationSeconds(nextDuration)
+    setTimeLeft(nextRemaining)
     setStatus('running')
+    persistTimerState({
+      status: 'running',
+      durationSeconds: nextDuration,
+      remainingSeconds: nextRemaining,
+      targetEndTime,
+    })
   }
 
   function handlePause() {
+    const remaining = sessionEndAtRef.current
+      ? Math.max(0, Math.ceil((sessionEndAtRef.current - Date.now()) / 1000))
+      : timeLeft
+    sessionEndAtRef.current = null
+    setTimeLeft(remaining)
     setStatus('paused')
+    persistTimerState({
+      status: 'paused',
+      remainingSeconds: remaining,
+      targetEndTime: null,
+    })
   }
 
   function handleReset() {
+    sessionEndAtRef.current = null
     if (mode === 'focus') {
       explodeActiveTomato()
       focusTomatoSpawnedRef.current = false
       focusSessionStartedAtRef.current = null
     }
+    const resetSeconds = mode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60
     setStatus('idle')
-    setTimeLeft(mode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60)
+    setDurationSeconds(resetSeconds)
+    setTimeLeft(resetSeconds)
+    persistTimerState({
+      status: 'idle',
+      durationSeconds: resetSeconds,
+      remainingSeconds: resetSeconds,
+      targetEndTime: null,
+    })
   }
 
   function handleSwitchMode(newMode) {
     if (newMode === mode) return
+    sessionEndAtRef.current = null
     if (mode === 'focus') {
       fadeActiveTomato()
       focusTomatoSpawnedRef.current = false
@@ -546,13 +831,22 @@ function Pomodoro() {
       focusTomatoSpawnedRef.current = false
       focusSessionStartedAtRef.current = null
     }
+    const nextSeconds = newMode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60
     setMode(newMode)
     setStatus('idle')
-    setTimeLeft(newMode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60)
+    setDurationSeconds(nextSeconds)
+    setTimeLeft(nextSeconds)
+    persistTimerState({
+      mode: newMode,
+      status: 'idle',
+      durationSeconds: nextSeconds,
+      remainingSeconds: nextSeconds,
+      targetEndTime: null,
+    })
   }
 
   const isFocus = mode === 'focus'
-  const totalSeconds = (isFocus ? focusMinutes : BREAK_MINUTES) * 60
+  const totalSeconds = durationSeconds
   const progress = totalSeconds > 0 ? (totalSeconds - timeLeft) / totalSeconds : 0
   const ringRadius = 72
   const ringCircumference = 2 * Math.PI * ringRadius
@@ -765,7 +1059,7 @@ function Pomodoro() {
                 opacity: node.opacity,
                 transform: getTomatoTransform(node),
                 filter: 'var(--pomodoro-tomato-drop-shadow)',
-                fontSize: tomatoEmojiFontSize,
+                fontSize: node.emojiFontSize || getTomatoEmojiFontSize(DEFAULT_FOCUS_MINUTES),
                 textShadow: 'var(--pomodoro-tomato-text-shadow)',
               }}
             >

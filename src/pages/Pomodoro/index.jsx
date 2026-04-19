@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { forceCollide, forceSimulation } from 'd3-force'
 import { load, save } from '../../utils/storage'
+import { getPomodoroUserId, savePomodoroSession } from '../../utils/pomodoroApi'
 
 // 时长常量（后续可由设置页写入 localStorage 后读取）
 const FOCUS_MINUTES_KEY = 'pomodoroFocusMinutes'
@@ -192,6 +193,7 @@ function Pomodoro() {
   const [todayCount, setTodayCount] = useState(() => loadTodayCount())
   const [notification, setNotification] = useState(null)
   const [tomatoNodes, setTomatoNodes] = useState(() => createSettledTomatoes(loadTodayCount()))
+  const [userId] = useState(() => getPomodoroUserId())
 
   const tomatoEmojiFontSize = getTomatoEmojiFontSize(focusMinutes)
 
@@ -205,7 +207,9 @@ function Pomodoro() {
   const sceneRef = useRef(null)
   const prevMouseRef = useRef(null)
   const dragNodeRef = useRef(null)
+  const focusSessionStartedAtRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
+
 
   useEffect(() => {
     nodesRef.current = tomatoNodes.map(node => ({ ...node }))
@@ -277,6 +281,7 @@ function Pomodoro() {
     }
   }, [])
 
+
   // Effect 1：status 为 running 时每秒递减
   useEffect(() => {
     if (status !== 'running') return
@@ -293,6 +298,9 @@ function Pomodoro() {
     setStatus('idle')
 
     if (mode === 'focus') {
+      const endedAt = new Date()
+      const startedAt = focusSessionStartedAtRef.current || new Date(endedAt.getTime() - focusMinutes * 60 * 1000)
+      focusSessionStartedAtRef.current = null
       settleActiveTomato()
       focusTomatoSpawnedRef.current = false
       setTodayCount(prev => {
@@ -300,6 +308,13 @@ function Pomodoro() {
         save(STATS_KEY, { date: getTodayStr(), count: next })
         return next
       })
+      savePomodoroSession({
+        userId,
+        startedAt: startedAt.toISOString(),
+        endedAt: endedAt.toISOString(),
+        durationSeconds: focusMinutes * 60,
+      })
+        .catch(error => showNotification(`番茄已完成，但云端保存失败：${error.message || '未知错误'}`))
       setMode('break')
       setTimeLeft(BREAK_MINUTES * 60)
       showNotification('专注结束！去休息 5 分钟吧')
@@ -309,7 +324,7 @@ function Pomodoro() {
       setTimeLeft(focusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, focusMinutes])
+  }, [timeLeft, status, mode, focusMinutes, userId])
 
   function showNotification(msg) {
     setNotification(msg)
@@ -493,6 +508,9 @@ function Pomodoro() {
   }
 
   function handleStart() {
+    if (mode === 'focus' && !focusSessionStartedAtRef.current) {
+      focusSessionStartedAtRef.current = new Date()
+    }
     if (mode === 'focus' && !focusTomatoSpawnedRef.current) {
       spawnFallingTomato()
       focusTomatoSpawnedRef.current = true
@@ -508,6 +526,7 @@ function Pomodoro() {
     if (mode === 'focus') {
       explodeActiveTomato()
       focusTomatoSpawnedRef.current = false
+      focusSessionStartedAtRef.current = null
     }
     setStatus('idle')
     setTimeLeft(mode === 'focus' ? focusMinutes * 60 : BREAK_MINUTES * 60)
@@ -518,9 +537,11 @@ function Pomodoro() {
     if (mode === 'focus') {
       fadeActiveTomato()
       focusTomatoSpawnedRef.current = false
+      focusSessionStartedAtRef.current = null
     }
     if (newMode === 'focus') {
       focusTomatoSpawnedRef.current = false
+      focusSessionStartedAtRef.current = null
     }
     setMode(newMode)
     setStatus('idle')

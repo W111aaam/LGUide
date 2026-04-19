@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import PomodoroHeatmap from '../../components/PomodoroHeatmap'
 import { load } from '../../utils/storage'
 
 function getTodayStr() {
@@ -109,6 +110,8 @@ function Dashboard() {
           </p>
         )}
       </section>
+
+      <PomodoroHeatmap />
 
       <div>
         <h2 className="text-base font-semibold text-gray-600 mb-3">快速入口</h2>

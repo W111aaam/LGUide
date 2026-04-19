@@ -1,0 +1,15 @@
+name = "lguide-pomodoro-api"
+main = "src/index.js"
+compatibility_date = "2026-04-18"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pomodoro-db"
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+
+# Optional: create a KV namespace and uncomment this if you want Worker-side
+# user metadata caching. The API works with D1 only if this binding is omitted.
+# [[kv_namespaces]]
+# binding = "USER_CACHE"
+# id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"

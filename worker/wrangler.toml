@@ -4,9 +4,9 @@ compatibility_date = "2026-04-18"
 workers_dev = true
 
 [[d1_databases]]
-binding = "DB"
+binding = "pomodoro_db"
 database_name = "pomodoro-db"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+database_id = "6d9076df-c2b0-447a-a10c-500887e3e0b7"
 
 # Optional: create a KV namespace and uncomment this if you want Worker-side
 # user metadata caching. The API works with D1 only if this binding is omitted.

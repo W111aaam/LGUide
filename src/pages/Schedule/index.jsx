@@ -343,13 +343,13 @@ function Schedule() {
                 onClick={() => zipInputRef.current?.click()}
                 className="text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-4 py-1.5 rounded-lg transition-colors"
               >
-                从文件导入
+                导入 sis 系统下载的 ICS zip
               </button>
               <button
                 onClick={() => setShowForm(true)}
                 className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg transition-colors"
               >
-                添加课程
+                手动添加课程
               </button>
             </div>
           )}

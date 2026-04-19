@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import {
   fetchPomodoroHeatmap,
   fetchPomodoroStats,
@@ -32,6 +33,7 @@ function formatDuration(seconds) {
 }
 
 function PomodoroHeatmap() {
+  const { user } = useAuth()
   const [days, setDays] = useState([])
   const [stats, setStats] = useState(null)
   const [error, setError] = useState('')
@@ -39,6 +41,14 @@ function PomodoroHeatmap() {
   const year = new Date().getFullYear()
 
   const refreshHistory = useCallback(async () => {
+    if (!user) {
+      setDays([])
+      setStats(null)
+      setError('')
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     try {
       const [heatmap, remoteStats] = await Promise.all([
@@ -53,7 +63,7 @@ function PomodoroHeatmap() {
     } finally {
       setIsLoading(false)
     }
-  }, [year])
+  }, [user, year])
 
   useEffect(() => {
     refreshHistory()
@@ -115,6 +125,12 @@ function PomodoroHeatmap() {
           <p className="mt-1 text-lg font-bold text-amber-950 dark:text-amber-50">{year}</p>
         </div>
       </div>
+
+      {!user && (
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
+          登录后可查看并同步云端番茄热力图。
+        </div>
+      )}
 
       {error && (
         <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200">

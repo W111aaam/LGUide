@@ -91,12 +91,17 @@ function Dashboard() {
 
     if (user) {
       syncTodayFocus()
+    } else {
+      setTodayFocus({
+        count: pomodoroStats?.date === todayStr ? pomodoroStats.count : 0,
+        minutes: (pomodoroStats?.date === todayStr ? pomodoroStats.count : 0) * 25,
+      })
     }
 
     return () => {
       isCancelled = true
     }
-  }, [todayStr, user])
+  }, [pomodoroStats?.count, pomodoroStats?.date, todayStr, user])
 
   return (
     <div className="space-y-6">

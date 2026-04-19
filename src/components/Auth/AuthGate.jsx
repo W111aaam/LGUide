@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
-function AuthGate() {
+function AuthGate({ isOpen, onClose }) {
   const { login, register } = useAuth()
   const [mode, setMode] = useState('login')
   const [username, setUsername] = useState('')
@@ -9,6 +9,18 @@ function AuthGate() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isBouncing, setIsBouncing] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setError('')
+      setIsSubmitting(false)
+    }
+  }, [isOpen])
+
+  if (!isOpen) {
+    return null
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -26,6 +38,7 @@ function AuthGate() {
       } else {
         await register({ username, password })
       }
+      onClose()
     } catch (submitError) {
       setError(submitError.message || '认证失败')
     } finally {
@@ -34,23 +47,41 @@ function AuthGate() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fff2e6,transparent_50%),linear-gradient(180deg,#fffaf4_0%,#fff 46%,#f7f7fb_100%)] px-4 py-12">
-      <div className="mx-auto max-w-4xl rounded-[2rem] border border-orange-100 bg-white/92 p-6 shadow-[0_30px_120px_rgba(154,52,18,0.12)] backdrop-blur sm:p-10">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-orange-400">LGUide Account</p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">登录后继续同步你的番茄历史</h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-gray-600">
-              现在番茄记录会跟账号绑定，而不是跟浏览器本地 UUID 绑定。清空浏览器记录后只需要重新登录，任何设备上都能看到同一份热力图和统计。
-            </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl bg-orange-50 px-4 py-3 text-sm text-orange-900">用户名密码保存在 D1</div>
-              <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-900">密码仅存哈希与盐值</div>
-              <div className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">登录会话使用 HttpOnly Cookie</div>
-            </div>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 px-4 py-8 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full max-w-4xl rounded-[2rem] border border-gray-200 bg-white p-6 shadow-[0_30px_120px_rgba(0,0,0,0.18)] sm:p-8"
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="grid gap-10 lg:grid-cols-[1fr_0.92fr] lg:items-center">
+          <div className="flex flex-col items-center justify-center rounded-[1.75rem] border border-gray-200 bg-[radial-gradient(circle_at_top,#fff0df,transparent_58%),linear-gradient(180deg,#fffdf9_0%,#fff5ea_100%)] px-6 py-10 text-center">
+            <button
+              type="button"
+              onClick={() => setIsBouncing(true)}
+              onAnimationEnd={() => setIsBouncing(false)}
+              className={`auth-tomato relative text-[7rem] leading-none drop-shadow-[0_18px_26px_rgba(154,52,18,0.24)] ${isBouncing ? 'is-bouncing' : ''}`}
+              aria-label="点击番茄"
+            >
+              🍅
+            </button>
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-black sm:text-4xl">登录后同步番茄记录</h2>
+            <p className="mt-3 text-sm leading-7 text-gray-600">点一下番茄，再登录或注册。</p>
           </div>
 
           <div className="rounded-[1.75rem] border border-gray-200 bg-white p-6 shadow-[0_20px_80px_rgba(15,23,42,0.08)] sm:p-8">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Account</p>
+                <h3 className="mt-2 text-2xl font-black text-black">登录 / 注册</h3>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-black"
+              >
+                关闭
+              </button>
+            </div>
+
             <div className="grid grid-cols-2 rounded-full bg-gray-100 p-1 text-sm font-semibold text-gray-500">
               <button
                 type="button"
@@ -126,7 +157,7 @@ function AuthGate() {
                 disabled={isSubmitting}
                 className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                {isSubmitting ? '提交中...' : mode === 'login' ? '登录并继续' : '创建账号并继续'}
+                {isSubmitting ? '提交中...' : mode === 'login' ? '登录' : '创建账号'}
               </button>
             </form>
           </div>

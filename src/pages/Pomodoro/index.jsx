@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { forceCollide, forceSimulation } from 'd3-force'
+import { useAuth } from '../../context/AuthContext'
 import { load, save } from '../../utils/storage'
 import { savePomodoroSession } from '../../utils/pomodoroApi'
 
@@ -185,6 +186,7 @@ function loadTodayCount() {
 // ---- 主组件 ----
 
 function Pomodoro() {
+  const { user } = useAuth()
   const [focusMinutes] = useState(() =>
     normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
   )
@@ -308,12 +310,14 @@ function Pomodoro() {
         save(STATS_KEY, { date: getTodayStr(), count: next })
         return next
       })
-      savePomodoroSession({
-        startedAt: startedAt.toISOString(),
-        endedAt: endedAt.toISOString(),
-        durationSeconds: focusMinutes * 60,
-      })
-        .catch(error => showNotification(`番茄已完成，但云端保存失败：${error.message || '未知错误'}`))
+      if (user) {
+        savePomodoroSession({
+          startedAt: startedAt.toISOString(),
+          endedAt: endedAt.toISOString(),
+          durationSeconds: focusMinutes * 60,
+        })
+          .catch(error => showNotification(`番茄已完成，但云端保存失败：${error.message || '未知错误'}`))
+      }
       setMode('break')
       setTimeLeft(BREAK_MINUTES * 60)
       showNotification('专注结束！去休息 5 分钟吧')
@@ -323,7 +327,7 @@ function Pomodoro() {
       setTimeLeft(focusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, focusMinutes])
+  }, [timeLeft, status, mode, focusMinutes, user])
 
   function showNotification(msg) {
     setNotification(msg)

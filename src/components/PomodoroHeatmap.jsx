@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getBeijingYear } from '../utils/date'
+import { getBeijingDateString, getBeijingYear } from '../utils/date'
 import {
   fetchPomodoroHeatmap,
   fetchPomodoroStats,
@@ -49,6 +49,7 @@ function PomodoroHeatmap() {
   const [isLoading, setIsLoading] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const year = getBeijingYear()
+  const todayDate = getBeijingDateString()
 
   function showTooltip(cell, target) {
     const section = sectionRef.current
@@ -128,6 +129,7 @@ function PomodoroHeatmap() {
         minutes,
         count: entry.count,
         level: getHeatLevel(minutes),
+        isToday: date === todayDate,
       }
     }),
   ]
@@ -212,6 +214,7 @@ function PomodoroHeatmap() {
                     cell.level === 2 && 'border-orange-300 bg-orange-400',
                     cell.level === 3 && 'border-orange-500 bg-orange-600',
                     cell.level === 4 && 'border-red-700 bg-red-700',
+                    cell.isToday && 'border-violet-600 ring-2 ring-violet-400/80 ring-offset-1 ring-offset-white shadow-[0_0_0_1px_rgba(129,140,248,0.35)] dark:ring-violet-300/85 dark:ring-offset-slate-900 dark:shadow-[0_0_0_1px_rgba(196,181,253,0.45)]',
                   ].filter(Boolean).join(' ')}
                 />
               )

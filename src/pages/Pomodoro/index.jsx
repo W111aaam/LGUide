@@ -328,8 +328,8 @@ function getSessionRemainingSeconds(session, now = Date.now()) {
 function getInitialTimerState(focusMinutes, todayStr = getBeijingDateString()) {
   const fallbackSeconds = getModeDurationSeconds('focus', focusMinutes)
   const session = loadTimerSession()
-  const fallbackTodayCount = loadTodayCount(todayStr)
-  const fallbackTomatoes = createSettledTomatoes(fallbackTodayCount, loadTodayTomatoEmojiSizes(todayStr))
+  const fallbackTodayCount = 0
+  const fallbackTomatoes = []
 
   if (!session) {
     return {
@@ -520,12 +520,6 @@ function Pomodoro() {
     }
 
     processedTodayStrRef.current = todayStr
-
-    save(STATS_KEY, {
-      date: todayStr,
-      count: 0,
-      tomatoEmojiSizes: [],
-    })
 
     const nextTransientTomatoes = [...completedTomatoesStateRef.current, ...transientTomatoesStateRef.current]
       .filter(node => !isHistoricalTomato(node))

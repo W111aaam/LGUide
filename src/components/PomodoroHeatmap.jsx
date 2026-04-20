@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { getBeijingYear } from '../utils/date'
 import {
   fetchPomodoroHeatmap,
   fetchPomodoroStats,
@@ -47,7 +48,7 @@ function PomodoroHeatmap() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [tooltip, setTooltip] = useState(null)
-  const year = new Date().getFullYear()
+  const year = getBeijingYear()
 
   function showTooltip(cell, target) {
     const section = sectionRef.current

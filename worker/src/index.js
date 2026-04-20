@@ -370,17 +370,18 @@ export default {
         const authSession = await requireAuthenticatedSession(request, env, defaultHeaders, requestId);
         if (authSession instanceof Response) return authSession;
 
-        const year = String(url.searchParams.get("year") || new Date().getUTCFullYear());
+        const beijingNow = new Date(Date.now() + 8 * 60 * 60 * 1000);
+        const year = String(url.searchParams.get("year") || beijingNow.getUTCFullYear());
 
         const rows = await env.DB.prepare(`
           SELECT
-            substr(started_at, 1, 10) AS date,
+            strftime('%Y-%m-%d', datetime(started_at, '+8 hours')) AS date,
             SUM(duration_seconds) AS total_seconds,
             SUM(completed) AS completed_count
           FROM pomodoro_sessions
           WHERE user_id = ?1
-            AND substr(started_at, 1, 4) = ?2
-          GROUP BY substr(started_at, 1, 10)
+            AND strftime('%Y', datetime(started_at, '+8 hours')) = ?2
+          GROUP BY strftime('%Y-%m-%d', datetime(started_at, '+8 hours'))
           ORDER BY date ASC
         `)
           .bind(authSession.user.id, year)
@@ -416,12 +417,12 @@ export default {
 
         const monthly = await env.DB.prepare(`
           SELECT
-            substr(started_at, 1, 7) AS month,
+            strftime('%Y-%m', datetime(started_at, '+8 hours')) AS month,
             SUM(duration_seconds) AS total_seconds,
             SUM(completed) AS completed_count
           FROM pomodoro_sessions
           WHERE user_id = ?1
-          GROUP BY substr(started_at, 1, 7)
+          GROUP BY strftime('%Y-%m', datetime(started_at, '+8 hours'))
           ORDER BY month DESC
           LIMIT 12
         `)
@@ -430,12 +431,12 @@ export default {
 
         const yearly = await env.DB.prepare(`
           SELECT
-            substr(started_at, 1, 4) AS year,
+            strftime('%Y', datetime(started_at, '+8 hours')) AS year,
             SUM(duration_seconds) AS total_seconds,
             SUM(completed) AS completed_count
           FROM pomodoro_sessions
           WHERE user_id = ?1
-          GROUP BY substr(started_at, 1, 4)
+          GROUP BY strftime('%Y', datetime(started_at, '+8 hours'))
           ORDER BY year DESC
         `)
           .bind(authSession.user.id)

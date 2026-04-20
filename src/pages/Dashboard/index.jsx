@@ -2,12 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PomodoroHeatmap from '../../components/PomodoroHeatmap'
 import { useAuth } from '../../context/AuthContext'
+import { getBeijingDateString, getBeijingDayOfWeek, getBeijingYear, getMillisecondsUntilNextBeijingMidnight } from '../../utils/date'
 import { load } from '../../utils/storage'
 import { fetchPomodoroHeatmap } from '../../utils/pomodoroApi'
-
-function getTodayStr() {
-  return new Date().toISOString().slice(0, 10)
-}
 
 function getCurrentTime() {
   const now = new Date()
@@ -45,8 +42,9 @@ function QuickLink({ to, label }) {
 
 function Dashboard() {
   const { user } = useAuth()
-  const todayStr = getTodayStr()
+  const [todayStr, setTodayStr] = useState(() => getBeijingDateString())
   const currentTime = getCurrentTime()
+  const currentBeijingYear = getBeijingYear()
   const assignments = load('assignments', [])
   const courses = load('courses', [])
   const pomodoroStats = load('pomodoroStats', null)
@@ -60,7 +58,7 @@ function Dashboard() {
   const todayTomato = todayFocus.count
   const todayFocusMinutes = todayFocus.minutes
 
-  const todayIndex = new Date().getDay()
+  const todayIndex = getBeijingDayOfWeek()
   const currentMinutes = parseTimeToMinutes(currentTime)
   const todayCourses = courses
     .filter(c => c.dayOfWeek === todayIndex)
@@ -73,11 +71,37 @@ function Dashboard() {
   )
 
   useEffect(() => {
+    function syncBeijingDay() {
+      const nextTodayStr = getBeijingDateString()
+      setTodayStr(current => (current === nextTodayStr ? current : nextTodayStr))
+    }
+
+    let timeoutId = null
+
+    function scheduleNextSync() {
+      timeoutId = window.setTimeout(() => {
+        syncBeijingDay()
+        scheduleNextSync()
+      }, getMillisecondsUntilNextBeijingMidnight())
+    }
+
+    scheduleNextSync()
+    window.addEventListener('focus', syncBeijingDay)
+
+    return () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId)
+      }
+      window.removeEventListener('focus', syncBeijingDay)
+    }
+  }, [])
+
+  useEffect(() => {
     let isCancelled = false
 
     async function syncTodayFocus() {
       try {
-        const heatmap = await fetchPomodoroHeatmap(new Date().getFullYear())
+        const heatmap = await fetchPomodoroHeatmap(currentBeijingYear)
         if (isCancelled) return
         const todayEntry = (heatmap.days || []).find(day => day.date === todayStr)
         setTodayFocus({
@@ -101,7 +125,7 @@ function Dashboard() {
     return () => {
       isCancelled = true
     }
-  }, [pomodoroStats?.count, pomodoroStats?.date, todayStr, user])
+  }, [currentBeijingYear, pomodoroStats?.count, pomodoroStats?.date, todayStr, user])
 
   return (
     <div className="space-y-6">

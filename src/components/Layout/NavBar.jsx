@@ -9,9 +9,22 @@ const navItems = [
   { to: '/', label: '首页', end: true },
   { to: '/assignments', label: '作业管理' },
   { to: '/pomodoro', label: '番茄钟' },
+  {
+    href: 'https://blog.nero-lithos.com/courseai/',
+    label: '选课助手',
+    external: true,
+  },
   { to: '/schedule', label: '课表' },
   { to: '/settings', label: '设置' },
 ]
+
+function getNavItemClass(isActive = false) {
+  return `shrink-0 whitespace-nowrap px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+    isActive
+      ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-orange-300'
+      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+  }`
+}
 
 function NavBar({ authReady, onOpenAuth }) {
   const { logout, user } = useAuth()
@@ -47,22 +60,32 @@ function NavBar({ authReady, onOpenAuth }) {
           <div className="flex items-center gap-6">
             <span className="font-bold text-indigo-600 text-lg dark:text-orange-300">LGUide</span>
             <nav className="flex gap-1">
-              {navItems.map(item => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  className={({ isActive }) =>
-                    `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-800 dark:text-orange-300'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              {navItems.map(item => {
+                if (item.external) {
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={getNavItemClass()}
+                    >
+                      {item.label}
+                    </a>
+                  )
+                }
+
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => getNavItemClass(isActive)}
+                  >
+                    {item.label}
+                  </NavLink>
+                )
+              })}
             </nav>
           </div>
 

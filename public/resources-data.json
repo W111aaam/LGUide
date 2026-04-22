@@ -1,0 +1,827 @@
+{
+  "generatedAt": "2026-04-22T04:02:38.789Z",
+  "sourceRepo": "Nerolithos/CUHKSZ_SDS_EXAMS",
+  "branch": "main",
+  "items": [
+    {
+      "name": "BIO1008",
+      "path": "BIO1008",
+      "type": "dir",
+      "fileCount": 1,
+      "files": [
+        {
+          "name": "BIO1008 Final.pdf",
+          "path": "BIO1008/BIO1008 Final.pdf",
+          "size": 6326964,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/BIO1008/BIO1008%20Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/BIO1008/BIO1008%20Final.pdf"
+        }
+      ]
+    },
+    {
+      "name": "CSC1003:1001",
+      "path": "CSC1003:1001",
+      "type": "dir",
+      "fileCount": 5,
+      "files": [
+        {
+          "name": "csc1001-Fall2021Final.pdf",
+          "path": "CSC1003:1001/csc1001-Fall2021Final.pdf",
+          "size": 406248,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC1003%3A1001/csc1001-Fall2021Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC1003%3A1001/csc1001-Fall2021Final.pdf"
+        },
+        {
+          "name": "csc1001-Fall2022Final.pdf",
+          "path": "CSC1003:1001/csc1001-Fall2022Final.pdf",
+          "size": 253137,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC1003%3A1001/csc1001-Fall2022Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC1003%3A1001/csc1001-Fall2022Final.pdf"
+        },
+        {
+          "name": "csc1001-Fall2024Final.pdf",
+          "path": "CSC1003:1001/csc1001-Fall2024Final.pdf",
+          "size": 592002,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC1003%3A1001/csc1001-Fall2024Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC1003%3A1001/csc1001-Fall2024Final.pdf"
+        },
+        {
+          "name": "csc1003-2022-23-midterm.pdf",
+          "path": "CSC1003:1001/csc1003-2022-23-midterm.pdf",
+          "size": 576262,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC1003%3A1001/csc1003-2022-23-midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC1003%3A1001/csc1003-2022-23-midterm.pdf"
+        },
+        {
+          "name": "csc1003-2023-24-midterm.pdf",
+          "path": "CSC1003:1001/csc1003-2023-24-midterm.pdf",
+          "size": 115103,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC1003%3A1001/csc1003-2023-24-midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC1003%3A1001/csc1003-2023-24-midterm.pdf"
+        }
+      ]
+    },
+    {
+      "name": "CSC3001",
+      "path": "CSC3001",
+      "type": "dir",
+      "fileCount": 18,
+      "files": [
+        {
+          "name": "2021F-Final.pdf",
+          "path": "CSC3001/2021F-Final.pdf",
+          "size": 152171,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2021F-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2021F-Final.pdf"
+        },
+        {
+          "name": "2022F-Final.pdf",
+          "path": "CSC3001/2022F-Final.pdf",
+          "size": 137141,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2022F-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2022F-Final.pdf"
+        },
+        {
+          "name": "2022F-Midterm.pdf",
+          "path": "CSC3001/2022F-Midterm.pdf",
+          "size": 130736,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2022F-Midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2022F-Midterm.pdf"
+        },
+        {
+          "name": "2022Sum-Final.pdf",
+          "path": "CSC3001/2022Sum-Final.pdf",
+          "size": 135656,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2022Sum-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2022Sum-Final.pdf"
+        },
+        {
+          "name": "2023F-Final.pdf",
+          "path": "CSC3001/2023F-Final.pdf",
+          "size": 126998,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2023F-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2023F-Final.pdf"
+        },
+        {
+          "name": "2023F-Midterm.pdf",
+          "path": "CSC3001/2023F-Midterm.pdf",
+          "size": 124500,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2023F-Midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2023F-Midterm.pdf"
+        },
+        {
+          "name": "2023S-Final.pdf",
+          "path": "CSC3001/2023S-Final.pdf",
+          "size": 118101,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2023S-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2023S-Final.pdf"
+        },
+        {
+          "name": "2024F-Final.pdf",
+          "path": "CSC3001/2024F-Final.pdf",
+          "size": 132193,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2024F-Final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2024F-Final.pdf"
+        },
+        {
+          "name": "2024F-Midterm.pdf",
+          "path": "CSC3001/2024F-Midterm.pdf",
+          "size": 139364,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/2024F-Midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/2024F-Midterm.pdf"
+        },
+        {
+          "name": "Final(1).pdf",
+          "path": "CSC3001/Final(1).pdf",
+          "size": 123287,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/Final(1).pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/Final(1).pdf"
+        },
+        {
+          "name": "mid_2019_sol.pdf",
+          "path": "CSC3001/mid_2019_sol.pdf",
+          "size": 4442289,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/mid_2019_sol.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/mid_2019_sol.pdf"
+        },
+        {
+          "name": "mid_2019.pdf",
+          "path": "CSC3001/mid_2019.pdf",
+          "size": 190749,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/mid_2019.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/mid_2019.pdf"
+        },
+        {
+          "name": "mid_2020_sol.pdf",
+          "path": "CSC3001/mid_2020_sol.pdf",
+          "size": 1028139,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/mid_2020_sol.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/mid_2020_sol.pdf"
+        },
+        {
+          "name": "mid_2020.pdf",
+          "path": "CSC3001/mid_2020.pdf",
+          "size": 153432,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/mid_2020.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/mid_2020.pdf"
+        },
+        {
+          "name": "Mid2025.pdf",
+          "path": "CSC3001/Mid2025.pdf",
+          "size": 111737,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/Mid2025.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/Mid2025.pdf"
+        },
+        {
+          "name": "Midterm revision.pdf",
+          "path": "CSC3001/Midterm revision.pdf",
+          "size": 2961034,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/Midterm%20revision.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/Midterm%20revision.pdf"
+        },
+        {
+          "name": "Practice Final from Ottawa.pdf",
+          "path": "CSC3001/Practice Final from Ottawa.pdf",
+          "size": 15863624,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/Practice%20Final%20from%20Ottawa.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/Practice%20Final%20from%20Ottawa.pdf"
+        },
+        {
+          "name": "Practice Final Solutions from Ottawa.pdf",
+          "path": "CSC3001/Practice Final Solutions from Ottawa.pdf",
+          "size": 178288,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3001/Practice%20Final%20Solutions%20from%20Ottawa.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3001/Practice%20Final%20Solutions%20from%20Ottawa.pdf"
+        }
+      ]
+    },
+    {
+      "name": "CSC3060",
+      "path": "CSC3060",
+      "type": "dir",
+      "fileCount": 4,
+      "files": [
+        {
+          "name": "3060Quiz1-2026 key.docx",
+          "path": "CSC3060/3060Quiz1-2026 key.docx",
+          "size": 74760,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/3060Quiz1-2026%20key.docx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/3060Quiz1-2026%20key.docx"
+        },
+        {
+          "name": "3060Quiz2-2026.key.docx",
+          "path": "CSC3060/3060Quiz2-2026.key.docx",
+          "size": 180587,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/3060Quiz2-2026.key.docx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/3060Quiz2-2026.key.docx"
+        },
+        {
+          "name": "PopQuiz3-2026.pptx",
+          "path": "CSC3060/PopQuiz3-2026.pptx",
+          "size": 327107,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/PopQuiz3-2026.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/PopQuiz3-2026.pptx"
+        },
+        {
+          "name": "PopQuiz4-2026.pptx",
+          "path": "CSC3060/PopQuiz4-2026.pptx",
+          "size": 243358,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/PopQuiz4-2026.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/PopQuiz4-2026.pptx"
+        }
+      ]
+    },
+    {
+      "name": "CSC3200:3100:3002",
+      "path": "CSC3200:3100:3002",
+      "type": "dir",
+      "fileCount": 7,
+      "files": [
+        {
+          "name": "CSC3002Final.pdf.pdf",
+          "path": "CSC3200:3100:3002/CSC3002Final.pdf.pdf",
+          "size": 346757,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3002Final.pdf.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3002Final.pdf.pdf"
+        },
+        {
+          "name": "CSC3002FinalAnswer.pdf.pdf",
+          "path": "CSC3200:3100:3002/CSC3002FinalAnswer.pdf.pdf",
+          "size": 608655,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3002FinalAnswer.pdf.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3002FinalAnswer.pdf.pdf"
+        },
+        {
+          "name": "CSC3100_2022_mid.pdf",
+          "path": "CSC3200:3100:3002/CSC3100_2022_mid.pdf",
+          "size": 154832,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3100_2022_mid.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3100_2022_mid.pdf"
+        },
+        {
+          "name": "CSC3100_2023_answer.pdf",
+          "path": "CSC3200:3100:3002/CSC3100_2023_answer.pdf",
+          "size": 97483,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3100_2023_answer.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3100_2023_answer.pdf"
+        },
+        {
+          "name": "CSC3100_2023_mid.pdf",
+          "path": "CSC3200:3100:3002/CSC3100_2023_mid.pdf",
+          "size": 80986,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3100_2023_mid.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3100_2023_mid.pdf"
+        },
+        {
+          "name": "CSC3200 Final Review.pdf",
+          "path": "CSC3200:3100:3002/CSC3200 Final Review.pdf",
+          "size": 4854568,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3200%20Final%20Review.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3200%20Final%20Review.pdf"
+        },
+        {
+          "name": "CSC3200_Review-Part2.pptx",
+          "path": "CSC3200:3100:3002/CSC3200_Review-Part2.pptx",
+          "size": 4535767,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3200%3A3100%3A3002/CSC3200_Review-Part2.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3200%3A3100%3A3002/CSC3200_Review-Part2.pptx"
+        }
+      ]
+    },
+    {
+      "name": "DDA2001",
+      "path": "DDA2001",
+      "type": "dir",
+      "fileCount": 3,
+      "files": [
+        {
+          "name": "final2024.pdf",
+          "path": "DDA2001/final2024.pdf",
+          "size": 380590,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/DDA2001/final2024.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/DDA2001/final2024.pdf"
+        },
+        {
+          "name": "final2025.pdf",
+          "path": "DDA2001/final2025.pdf",
+          "size": 404132,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/DDA2001/final2025.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/DDA2001/final2025.pdf"
+        },
+        {
+          "name": "Mid2025.pdf",
+          "path": "DDA2001/Mid2025.pdf",
+          "size": 241538,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/DDA2001/Mid2025.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/DDA2001/Mid2025.pdf"
+        }
+      ]
+    },
+    {
+      "name": "DDA3003",
+      "path": "DDA3003",
+      "type": "dir",
+      "fileCount": 2,
+      "files": [
+        {
+          "name": "DDA3003_Midterm_Reviews.pdf",
+          "path": "DDA3003/DDA3003_Midterm_Reviews.pdf",
+          "size": 335111,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/DDA3003/DDA3003_Midterm_Reviews.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/DDA3003/DDA3003_Midterm_Reviews.pdf"
+        },
+        {
+          "name": "ddamid.pdf",
+          "path": "DDA3003/ddamid.pdf",
+          "size": 303768,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/DDA3003/ddamid.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/DDA3003/ddamid.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT1001 Final",
+      "path": "MAT1001 Final",
+      "type": "dir",
+      "fileCount": 3,
+      "files": [
+        {
+          "name": "FinalExam2020.pdf",
+          "path": "MAT1001 Final/FinalExam2020.pdf",
+          "size": 516520,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20Final/FinalExam2020.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20Final/FinalExam2020.pdf"
+        },
+        {
+          "name": "MAT1001 Final 2022.pdf",
+          "path": "MAT1001 Final/MAT1001 Final 2022.pdf",
+          "size": 210784,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20Final/MAT1001%20Final%202022.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20Final/MAT1001%20Final%202022.pdf"
+        },
+        {
+          "name": "MAT1001 Final 2023.pdf",
+          "path": "MAT1001 Final/MAT1001 Final 2023.pdf",
+          "size": 164988,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20Final/MAT1001%20Final%202023.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20Final/MAT1001%20Final%202023.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT1001 MID",
+      "path": "MAT1001 MID",
+      "type": "dir",
+      "fileCount": 13,
+      "files": [
+        {
+          "name": "1001 mt sol 2022 V2.pdf",
+          "path": "MAT1001 MID/1001 mt sol 2022 V2.pdf",
+          "size": 1977854,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/1001%20mt%20sol%202022%20V2.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/1001%20mt%20sol%202022%20V2.pdf"
+        },
+        {
+          "name": "1001 mt sol 2023.pdf",
+          "path": "MAT1001 MID/1001 mt sol 2023.pdf",
+          "size": 2693099,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/1001%20mt%20sol%202023.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/1001%20mt%20sol%202023.pdf"
+        },
+        {
+          "name": "11701728891830_.pic.jpg",
+          "path": "MAT1001 MID/11701728891830_.pic.jpg",
+          "size": 172746,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/11701728891830_.pic.jpg",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/11701728891830_.pic.jpg"
+        },
+        {
+          "name": "11711728891835_.pic.jpg",
+          "path": "MAT1001 MID/11711728891835_.pic.jpg",
+          "size": 352537,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/11711728891835_.pic.jpg",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/11711728891835_.pic.jpg"
+        },
+        {
+          "name": "11721728891842_.pic.jpg",
+          "path": "MAT1001 MID/11721728891842_.pic.jpg",
+          "size": 365705,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/11721728891842_.pic.jpg",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/11721728891842_.pic.jpg"
+        },
+        {
+          "name": "11731728891851_.pic.jpg",
+          "path": "MAT1001 MID/11731728891851_.pic.jpg",
+          "size": 260915,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/11731728891851_.pic.jpg",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/11731728891851_.pic.jpg"
+        },
+        {
+          "name": "CSC1003_2022_23_Midterm-v2.pdf",
+          "path": "MAT1001 MID/CSC1003_2022_23_Midterm-v2.pdf",
+          "size": 542946,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/CSC1003_2022_23_Midterm-v2.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/CSC1003_2022_23_Midterm-v2.pdf"
+        },
+        {
+          "name": "CSC1003_2023_24_Midterm.pdf",
+          "path": "MAT1001 MID/CSC1003_2023_24_Midterm.pdf",
+          "size": 82315,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/CSC1003_2023_24_Midterm.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/CSC1003_2023_24_Midterm.pdf"
+        },
+        {
+          "name": "mat1001 midterm .pdf",
+          "path": "MAT1001 MID/mat1001 midterm .pdf",
+          "size": 260933,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/mat1001%20midterm%20.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/mat1001%20midterm%20.pdf"
+        },
+        {
+          "name": "MAT1001 Midterm (2023).pdf",
+          "path": "MAT1001 MID/MAT1001 Midterm (2023).pdf",
+          "size": 151024,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/MAT1001%20Midterm%20(2023).pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/MAT1001%20Midterm%20(2023).pdf"
+        },
+        {
+          "name": "MAT1001 Midterm 2021.pdf",
+          "path": "MAT1001 MID/MAT1001 Midterm 2021.pdf",
+          "size": 257807,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/MAT1001%20Midterm%202021.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/MAT1001%20Midterm%202021.pdf"
+        },
+        {
+          "name": "MAT1001 Midterm 2022.pdf",
+          "path": "MAT1001 MID/MAT1001 Midterm 2022.pdf",
+          "size": 147121,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/MAT1001%20Midterm%202022.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/MAT1001%20Midterm%202022.pdf"
+        },
+        {
+          "name": "MAT1001_Mid_2023.pdf",
+          "path": "MAT1001 MID/MAT1001_Mid_2023.pdf",
+          "size": 3521548,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1001%20MID/MAT1001_Mid_2023.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1001%20MID/MAT1001_Mid_2023.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT1002 Final",
+      "path": "MAT1002 Final",
+      "type": "dir",
+      "fileCount": 2,
+      "files": [
+        {
+          "name": "MAT1002 Final 2023.pdf",
+          "path": "MAT1002 Final/MAT1002 Final 2023.pdf",
+          "size": 163701,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20Final/MAT1002%20Final%202023.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20Final/MAT1002%20Final%202023.pdf"
+        },
+        {
+          "name": "MAT1002_Final_2024.pdf",
+          "path": "MAT1002 Final/MAT1002_Final_2024.pdf",
+          "size": 2632231,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20Final/MAT1002_Final_2024.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20Final/MAT1002_Final_2024.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT1002 MID",
+      "path": "MAT1002 MID",
+      "type": "dir",
+      "fileCount": 5,
+      "files": [
+        {
+          "name": "2023answer.pdf",
+          "path": "MAT1002 MID/2023answer.pdf",
+          "size": 2521369,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20MID/2023answer.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20MID/2023answer.pdf"
+        },
+        {
+          "name": "2024answer.pdf",
+          "path": "MAT1002 MID/2024answer.pdf",
+          "size": 3261093,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20MID/2024answer.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20MID/2024answer.pdf"
+        },
+        {
+          "name": "MAT1002 Midterm (2024).pdf",
+          "path": "MAT1002 MID/MAT1002 Midterm (2024).pdf",
+          "size": 151195,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20MID/MAT1002%20Midterm%20(2024).pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20MID/MAT1002%20Midterm%20(2024).pdf"
+        },
+        {
+          "name": "MAT1002 Midterm 2023.pdf",
+          "path": "MAT1002 MID/MAT1002 Midterm 2023.pdf",
+          "size": 167420,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20MID/MAT1002%20Midterm%202023.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20MID/MAT1002%20Midterm%202023.pdf"
+        },
+        {
+          "name": "MAT1002_Mid_2024.pdf",
+          "path": "MAT1002 MID/MAT1002_Mid_2024.pdf",
+          "size": 2724495,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT1002%20MID/MAT1002_Mid_2024.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT1002%20MID/MAT1002_Mid_2024.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT2041",
+      "path": "MAT2041",
+      "type": "dir",
+      "fileCount": 6,
+      "files": [
+        {
+          "name": "MAT2041_2025_Final_Sol.pdf",
+          "path": "MAT2041/MAT2041_2025_Final_Sol.pdf",
+          "size": 85204,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041_2025_Final_Sol.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041_2025_Final_Sol.pdf"
+        },
+        {
+          "name": "MAT2041_2025_sample_paper_v12_correct4c.pdf",
+          "path": "MAT2041/MAT2041_2025_sample_paper_v12_correct4c.pdf",
+          "size": 201841,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041_2025_sample_paper_v12_correct4c.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041_2025_sample_paper_v12_correct4c.pdf"
+        },
+        {
+          "name": "MAT2041_2025_sample_paper_withoutsolution_v8.pdf",
+          "path": "MAT2041/MAT2041_2025_sample_paper_withoutsolution_v8.pdf",
+          "size": 148266,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041_2025_sample_paper_withoutsolution_v8.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041_2025_sample_paper_withoutsolution_v8.pdf"
+        },
+        {
+          "name": "MAT2041_25S___sample_midterm_problems.pdf",
+          "path": "MAT2041/MAT2041_25S___sample_midterm_problems.pdf",
+          "size": 52975,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041_25S___sample_midterm_problems.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041_25S___sample_midterm_problems.pdf"
+        },
+        {
+          "name": "MAT2041_25S___sample_midterm_solutions.pdf",
+          "path": "MAT2041/MAT2041_25S___sample_midterm_solutions.pdf",
+          "size": 78513,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041_25S___sample_midterm_solutions.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041_25S___sample_midterm_solutions.pdf"
+        },
+        {
+          "name": "MAT2041-25S-Midterm-Solutions-Rubrics.pdf",
+          "path": "MAT2041/MAT2041-25S-Midterm-Solutions-Rubrics.pdf",
+          "size": 86769,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT2041/MAT2041-25S-Midterm-Solutions-Rubrics.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT2041/MAT2041-25S-Midterm-Solutions-Rubrics.pdf"
+        }
+      ]
+    },
+    {
+      "name": "MAT3007",
+      "path": "MAT3007",
+      "type": "dir",
+      "fileCount": 10,
+      "files": [
+        {
+          "name": "fall2023mid.pdf",
+          "path": "MAT3007/fall2023mid.pdf",
+          "size": 168818,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/fall2023mid.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/fall2023mid.pdf"
+        },
+        {
+          "name": "SampleMidSpring2025Solution.pdf",
+          "path": "MAT3007/SampleMidSpring2025Solution.pdf",
+          "size": 257768,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/SampleMidSpring2025Solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/SampleMidSpring2025Solution.pdf"
+        },
+        {
+          "name": "SampleMidSummer2025Solution.pdf",
+          "path": "MAT3007/SampleMidSummer2025Solution.pdf",
+          "size": 144322,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/SampleMidSummer2025Solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/SampleMidSummer2025Solution.pdf"
+        },
+        {
+          "name": "spring2022final_solutions.pdf",
+          "path": "MAT3007/spring2022final_solutions.pdf",
+          "size": 946931,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2022final_solutions.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2022final_solutions.pdf"
+        },
+        {
+          "name": "spring2023final.pdf",
+          "path": "MAT3007/spring2023final.pdf",
+          "size": 477435,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2023final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2023final.pdf"
+        },
+        {
+          "name": "spring2023mid.pdf",
+          "path": "MAT3007/spring2023mid.pdf",
+          "size": 445053,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2023mid.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2023mid.pdf"
+        },
+        {
+          "name": "spring2024final-sample.pdf",
+          "path": "MAT3007/spring2024final-sample.pdf",
+          "size": 348709,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2024final-sample.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2024final-sample.pdf"
+        },
+        {
+          "name": "spring2024mid_solution.pdf",
+          "path": "MAT3007/spring2024mid_solution.pdf",
+          "size": 211961,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2024mid_solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2024mid_solution.pdf"
+        },
+        {
+          "name": "spring2025final.pdf",
+          "path": "MAT3007/spring2025final.pdf",
+          "size": 290302,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2025final.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2025final.pdf"
+        },
+        {
+          "name": "spring2025finalSample.pdf",
+          "path": "MAT3007/spring2025finalSample.pdf",
+          "size": 338239,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/MAT3007/spring2025finalSample.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/MAT3007/spring2025finalSample.pdf"
+        }
+      ]
+    },
+    {
+      "name": "PHY1001",
+      "path": "PHY1001",
+      "type": "dir",
+      "fileCount": 12,
+      "files": [
+        {
+          "name": "2023-PHY1001-midterm_solutions_2.pdf",
+          "path": "PHY1001/2023-PHY1001-midterm_solutions_2.pdf",
+          "size": 7948255,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/2023-PHY1001-midterm_solutions_2.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/2023-PHY1001-midterm_solutions_2.pdf"
+        },
+        {
+          "name": "2025_PHY1001_midterm_Solution Guide.pdf",
+          "path": "PHY1001/2025_PHY1001_midterm_Solution Guide.pdf",
+          "size": 24676021,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/2025_PHY1001_midterm_Solution%20Guide.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/2025_PHY1001_midterm_Solution%20Guide.pdf"
+        },
+        {
+          "name": "PHY1001_final_2022-solution.pdf",
+          "path": "PHY1001/PHY1001_final_2022-solution.pdf",
+          "size": 17780873,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_final_2022-solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_final_2022-solution.pdf"
+        },
+        {
+          "name": "PHY1001_final_2022.pdf",
+          "path": "PHY1001/PHY1001_final_2022.pdf",
+          "size": 2492142,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_final_2022.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_final_2022.pdf"
+        },
+        {
+          "name": "PHY1001_Final_2024_solution.pdf",
+          "path": "PHY1001/PHY1001_Final_2024_solution.pdf",
+          "size": 22255736,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Final_2024_solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Final_2024_solution.pdf"
+        },
+        {
+          "name": "PHY1001_Final_2024.pdf",
+          "path": "PHY1001/PHY1001_Final_2024.pdf",
+          "size": 3720740,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Final_2024.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Final_2024.pdf"
+        },
+        {
+          "name": "PHY1001_Final_2025_Solution.pdf",
+          "path": "PHY1001/PHY1001_Final_2025_Solution.pdf",
+          "size": 2546149,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Final_2025_Solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Final_2025_Solution.pdf"
+        },
+        {
+          "name": "PHY1001_Final_2025_Solutions_Guidelines.pdf",
+          "path": "PHY1001/PHY1001_Final_2025_Solutions_Guidelines.pdf",
+          "size": 16312123,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Final_2025_Solutions_Guidelines.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Final_2025_Solutions_Guidelines.pdf"
+        },
+        {
+          "name": "PHY1001_Final_2025.pdf",
+          "path": "PHY1001/PHY1001_Final_2025.pdf",
+          "size": 4012806,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Final_2025.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Final_2025.pdf"
+        },
+        {
+          "name": "PHY1001_midterm_2024_solution.pdf",
+          "path": "PHY1001/PHY1001_midterm_2024_solution.pdf",
+          "size": 13595771,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_midterm_2024_solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_midterm_2024_solution.pdf"
+        },
+        {
+          "name": "PHY1001_Midterm_2024.pdf",
+          "path": "PHY1001/PHY1001_Midterm_2024.pdf",
+          "size": 1579625,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_Midterm_2024.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_Midterm_2024.pdf"
+        },
+        {
+          "name": "PHY1001_midterm_2025.pdf",
+          "path": "PHY1001/PHY1001_midterm_2025.pdf",
+          "size": 1560489,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/PHY1001/PHY1001_midterm_2025.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/PHY1001/PHY1001_midterm_2025.pdf"
+        }
+      ]
+    },
+    {
+      "name": "STA2001",
+      "path": "STA2001",
+      "type": "dir",
+      "fileCount": 9,
+      "files": [
+        {
+          "name": "Final2023summer.pdf",
+          "path": "STA2001/Final2023summer.pdf",
+          "size": 661551,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Final2023summer.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Final2023summer.pdf"
+        },
+        {
+          "name": "Final2025SummerSample.pdf",
+          "path": "STA2001/Final2025SummerSample.pdf",
+          "size": 206191,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Final2025SummerSample.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Final2025SummerSample.pdf"
+        },
+        {
+          "name": "Mid2023 paper.pdf",
+          "path": "STA2001/Mid2023 paper.pdf",
+          "size": 245027,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Mid2023%20paper.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Mid2023%20paper.pdf"
+        },
+        {
+          "name": "Mid2023 solution.pdf",
+          "path": "STA2001/Mid2023 solution.pdf",
+          "size": 347917,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Mid2023%20solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Mid2023%20solution.pdf"
+        },
+        {
+          "name": "Mid2024 paper.pdf",
+          "path": "STA2001/Mid2024 paper.pdf",
+          "size": 366510,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Mid2024%20paper.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Mid2024%20paper.pdf"
+        },
+        {
+          "name": "Mid2024 solution.pdf",
+          "path": "STA2001/Mid2024 solution.pdf",
+          "size": 691247,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/Mid2024%20solution.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/Mid2024%20solution.pdf"
+        },
+        {
+          "name": "STA2001_Final_2024Summerv1.pdf",
+          "path": "STA2001/STA2001_Final_2024Summerv1.pdf",
+          "size": 170715,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/STA2001_Final_2024Summerv1.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/STA2001_Final_2024Summerv1.pdf"
+        },
+        {
+          "name": "STA2001_Midterm_2024Summerv1.pdf",
+          "path": "STA2001/STA2001_Midterm_2024Summerv1.pdf",
+          "size": 360567,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/STA2001_Midterm_2024Summerv1.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/STA2001_Midterm_2024Summerv1.pdf"
+        },
+        {
+          "name": "STA2001_Midterm_25summer_withsol.pdf",
+          "path": "STA2001/STA2001_Midterm_25summer_withsol.pdf",
+          "size": 383846,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/STA2001/STA2001_Midterm_25summer_withsol.pdf",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/STA2001/STA2001_Midterm_25summer_withsol.pdf"
+        }
+      ]
+    }
+  ]
+}

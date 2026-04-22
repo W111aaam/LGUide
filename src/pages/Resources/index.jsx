@@ -4,75 +4,28 @@ import { Link, useParams } from 'react-router-dom'
 const GITHUB_OWNER = 'Nerolithos'
 const GITHUB_REPO = 'CUHKSZ_SDS_EXAMS'
 const GITHUB_BRANCH = 'main'
-const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`
-const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}`
-
-function encodePathSegments(path) {
-  return path
-    .split('/')
-    .map(segment => encodeURIComponent(segment))
-    .join('/')
-}
-
-function getRawDownloadUrl(path) {
-  return `${RAW_BASE}/${encodePathSegments(path)}`
-}
+const RESOURCES_DATA_PATH = '/resources-data.json'
 
 function getGitHubTreeUrl(path) {
-  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/tree/${GITHUB_BRANCH}/${encodePathSegments(path)}`
+  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/tree/${GITHUB_BRANCH}/${path
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/')}`
 }
 
 function getGitHubFileUrl(path) {
-  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/${encodePathSegments(path)}`
+  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/${path
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/')}`
 }
 
 async function fetchJson(url) {
   const response = await fetch(url)
   if (!response.ok) {
-    throw new Error(`GitHub 请求失败：${response.status}`)
+    throw new Error(`资料数据加载失败：${response.status}`)
   }
   return response.json()
-}
-
-async function fetchRepoRootItems() {
-  const items = await fetchJson(`${GITHUB_API_BASE}/contents`)
-  return items
-    .filter(item => !item.name.startsWith('.') && item.name.toLowerCase() !== 'readme.md')
-    .sort((left, right) => {
-      if (left.type === right.type) {
-        return left.name.localeCompare(right.name)
-      }
-      return left.type === 'dir' ? -1 : 1
-    })
-}
-
-async function fetchDirectoryFiles(item) {
-  if (item.type === 'file') {
-    if (item.name === '.DS_Store') {
-      return []
-    }
-
-    return [{
-      name: item.name,
-      path: item.path,
-      size: item.size || 0,
-      downloadUrl: item.download_url || getRawDownloadUrl(item.path),
-      htmlUrl: item.html_url || getGitHubFileUrl(item.path),
-    }]
-  }
-
-  const treeUrl = `${item.git_url}?recursive=1`
-  const tree = await fetchJson(treeUrl)
-  return (tree.tree || [])
-    .filter(node => node.type === 'blob' && node.path.split('/').pop() !== '.DS_Store')
-    .map(node => ({
-      name: node.path.split('/').pop() || node.path,
-      path: `${item.path}/${node.path}`,
-      size: node.size || 0,
-      downloadUrl: getRawDownloadUrl(`${item.path}/${node.path}`),
-      htmlUrl: getGitHubFileUrl(`${item.path}/${node.path}`),
-    }))
-    .sort((left, right) => left.path.localeCompare(right.path))
 }
 
 function formatFileCount(count) {
@@ -116,8 +69,6 @@ function Resources() {
   const [items, setItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
-  const [filesByPath, setFilesByPath] = useState({})
-  const [loadingPath, setLoadingPath] = useState('')
 
   useEffect(() => {
     let isCancelled = false
@@ -127,27 +78,14 @@ function Resources() {
       setError('')
 
       try {
-        const rootItems = await fetchRepoRootItems()
-        const itemsWithCounts = await Promise.all(
-          rootItems.map(async item => {
-            const files = await fetchDirectoryFiles(item)
-            return {
-              ...item,
-              fileCount: files.length,
-              previewFiles: files,
-            }
-          }),
-        )
+        const resourceData = await fetchJson(RESOURCES_DATA_PATH)
 
         if (isCancelled) return
 
-        setItems(itemsWithCounts)
-        setFilesByPath(
-          Object.fromEntries(itemsWithCounts.map(item => [item.path, item.previewFiles])),
-        )
+        setItems(resourceData.items || [])
       } catch (loadError) {
         if (isCancelled) return
-        setError(loadError.message || '资料目录加载失败')
+        setError(loadError.message || '资料数据加载失败')
       } finally {
         if (!isCancelled) {
           setIsLoading(false)
@@ -171,43 +109,7 @@ function Resources() {
     return items.find(item => item.name === decodedName) || null
   }, [items, resourceName])
 
-  useEffect(() => {
-    if (!activeItem || filesByPath[activeItem.path]) {
-      return
-    }
-
-    let isCancelled = false
-
-    async function loadFiles() {
-      setLoadingPath(activeItem.path)
-      try {
-        const files = await fetchDirectoryFiles(activeItem)
-        if (isCancelled) {
-          return
-        }
-        setFilesByPath(current => ({
-          ...current,
-          [activeItem.path]: files,
-        }))
-      } catch (loadError) {
-        if (!isCancelled) {
-          setError(loadError.message || '文件列表加载失败')
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoadingPath('')
-        }
-      }
-    }
-
-    loadFiles()
-
-    return () => {
-      isCancelled = true
-    }
-  }, [activeItem, filesByPath])
-
-  const activeFiles = activeItem ? filesByPath[activeItem.path] || [] : []
+  const activeFiles = activeItem ? activeItem.files || [] : []
 
   const isDetailPage = Boolean(resourceName)
 
@@ -282,11 +184,7 @@ function Resources() {
           </div>
 
           <div className="mt-5 space-y-3">
-            {loadingPath === activeItem.path ? (
-              <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-6 text-sm text-gray-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-                正在加载文件列表...
-              </div>
-            ) : activeFiles.length > 0 ? (
+            {activeFiles.length > 0 ? (
               activeFiles.map(file => (
                 <div
                   key={file.path}

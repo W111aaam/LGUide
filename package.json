@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-resources-data.mjs",
+    "prebuild": "node scripts/generate-resources-data.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "npm run build && wrangler dev",

@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { forceCollide, forceSimulation } from 'd3-force'
 import { useAuth } from '../../context/AuthContext'
+import {
+  getAlarmAudioSrc,
+  loadAlarmSoundEnabled,
+  playAlarmSound,
+  showWebPopup,
+} from '../../utils/alarm'
 import { getBeijingDateString, getMillisecondsUntilNextBeijingMidnight } from '../../utils/date'
 import { load, save } from '../../utils/storage'
 import { savePomodoroSession } from '../../utils/pomodoroApi'
@@ -408,6 +414,7 @@ function Pomodoro() {
   const [durationSeconds, setDurationSeconds] = useState(initialTimerState.totalSeconds)
   const [todayCount, setTodayCount] = useState(initialTimerState.todayCount)
   const [notification, setNotification] = useState(null)
+  const [alarmSoundEnabled, setAlarmSoundEnabled] = useState(() => loadAlarmSoundEnabled())
   const [completedTomatoes, setCompletedTomatoes] = useState(initialTimerState.completedTomatoes)
   const [transientTomatoes, setTransientTomatoes] = useState(initialTimerState.transientTomatoes)
   const tomatoNodes = [...completedTomatoes, ...transientTomatoes]
@@ -418,6 +425,7 @@ function Pomodoro() {
   const simulationRef = useRef(null)
   const animationFrameRef = useRef(null)
   const notificationTimeoutRef = useRef(null)
+  const alarmAudioRef = useRef(null)
   const nextTomatoIdRef = useRef(initialTimerState.nextTomatoId)
   const activeTomatoIdRef = useRef(initialTimerState.activeTomatoId)
   const focusTomatoSpawnedRef = useRef(initialTimerState.focusTomatoSpawned)
@@ -567,6 +575,19 @@ function Pomodoro() {
     }
   }, [])
 
+  useEffect(() => {
+    function syncAlarmSetting() {
+      setAlarmSoundEnabled(loadAlarmSoundEnabled())
+    }
+
+    window.addEventListener('focus', syncAlarmSetting)
+    window.addEventListener('storage', syncAlarmSetting)
+    return () => {
+      window.removeEventListener('focus', syncAlarmSetting)
+      window.removeEventListener('storage', syncAlarmSetting)
+    }
+  }, [])
+
 
   useEffect(() => {
     nodesRef.current = [...completedTomatoesStateRef.current, ...transientTomatoesStateRef.current].map(node => ({ ...node }))
@@ -694,14 +715,25 @@ function Pomodoro() {
       setTimeLeft(BREAK_MINUTES * 60)
       setDurationSeconds(BREAK_MINUTES * 60)
       showNotification('专注结束！去休息 5 分钟吧')
+      triggerPomodoroReminder('番茄钟提醒', '专注结束！去休息 5 分钟吧')
     } else {
       focusTomatoSpawnedRef.current = false
       setMode('focus')
       setTimeLeft(settingsFocusMinutes * 60)
       setDurationSeconds(settingsFocusMinutes * 60)
       showNotification('休息结束！开始下一个番茄')
+      triggerPomodoroReminder('番茄钟提醒', '休息结束！开始下一个番茄')
     }
-  }, [timeLeft, status, mode, durationSeconds, settingsFocusMinutes, user, currentTomatoEmojiFontSize])
+  }, [
+    timeLeft,
+    status,
+    mode,
+    durationSeconds,
+    settingsFocusMinutes,
+    user,
+    currentTomatoEmojiFontSize,
+    alarmSoundEnabled,
+  ])
 
   function showNotification(msg) {
     setNotification(msg)
@@ -709,6 +741,11 @@ function Pomodoro() {
       clearTimeout(notificationTimeoutRef.current)
     }
     notificationTimeoutRef.current = setTimeout(() => setNotification(null), 4000)
+  }
+
+  function triggerPomodoroReminder(title, message) {
+    showWebPopup(title, message)
+    playAlarmSound(alarmAudioRef.current, alarmSoundEnabled)
   }
 
   function refreshSimulation(alpha = 0.7) {
@@ -1041,6 +1078,8 @@ function Pomodoro() {
 
   return (
     <div className="pomodoro-page space-y-4">
+      <audio ref={alarmAudioRef} src={getAlarmAudioSrc()} preload="auto" className="hidden" />
+
       <h1 className="pomodoro-title text-2xl font-bold">番茄钟</h1>
 
       {/* 倒计时结束通知 */}

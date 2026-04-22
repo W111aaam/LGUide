@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { loadAlarmSoundEnabled, saveAlarmSoundEnabled } from '../../utils/alarm'
 import { load, save } from '../../utils/storage'
 import { getStoredTheme, saveTheme, THEMES } from '../../utils/theme'
 import { isPomodoroSessionLocked } from '../../utils/pomodoroSession'
@@ -43,6 +44,7 @@ function Settings() {
   )
   const [focusInputValue, setFocusInputValue] = useState(() => String(focusMinutes))
   const [theme, setTheme] = useState(() => getStoredTheme())
+  const [alarmSoundEnabled, setAlarmSoundEnabled] = useState(() => loadAlarmSoundEnabled())
   const [timerNotice, setTimerNotice] = useState('')
   const timerNoticeTimeoutRef = useRef(null)
 
@@ -90,6 +92,10 @@ function Settings() {
 
   function handleThemeChange(nextTheme) {
     setTheme(saveTheme(nextTheme))
+  }
+
+  function handleAlarmSoundToggle() {
+    setAlarmSoundEnabled(current => saveAlarmSoundEnabled(!current))
   }
 
   const themeOptions = [
@@ -176,6 +182,25 @@ function Settings() {
             <span>{MIN_FOCUS_MINUTES} 分钟</span>
             <span>2 小时</span>
           </div>
+        </SettingRow>
+        <SettingRow
+          label="闹钟声音"
+          description="课前十分钟和番茄钟结束时播放提醒音；关闭后仍保留网页弹框提醒"
+          badge={alarmSoundEnabled ? '已开启' : '已关闭'}
+        >
+          <button
+            type="button"
+            onClick={handleAlarmSoundToggle}
+            className={`mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+              alarmSoundEnabled
+                ? 'bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-400/15 dark:text-orange-200 dark:hover:bg-orange-400/25'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+            }`}
+            aria-pressed={alarmSoundEnabled}
+          >
+            <span aria-hidden="true">{alarmSoundEnabled ? '🔔' : '🔕'}</span>
+            {alarmSoundEnabled ? '关闭闹钟声音' : '开启闹钟声音'}
+          </button>
         </SettingRow>
         <SettingRow
           label="短休息时长"

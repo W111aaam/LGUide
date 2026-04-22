@@ -1,11 +1,34 @@
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import JSZip from 'jszip'
+import { getAlarmAudioSrc, loadAlarmSoundEnabled, playAlarmSound, showWebPopup } from '../../utils/alarm'
+import { getBeijingDateString } from '../../utils/date'
 import { load, save } from '../../utils/storage'
 import CourseForm, { DAY_NAMES } from './CourseForm'
 import { parseIcsEvents } from './parseIcs'
 
 const COURSES_KEY = 'courses'
 const IMAGE_KEY = 'scheduleImage'
+const COURSE_REMINDER_HISTORY_KEY = 'courseReminderHistory'
+
+function getCourseReminderKey(course, todayStr) {
+  return `${todayStr}|${course.id}|${course.startTime}`
+}
+
+function loadReminderHistory(todayStr) {
+  const stored = load(COURSE_REMINDER_HISTORY_KEY, null)
+  return stored?.date === todayStr && Array.isArray(stored.keys) ? stored.keys : []
+}
+
+function saveReminderHistory(todayStr, keys) {
+  save(COURSE_REMINDER_HISTORY_KEY, { date: todayStr, keys })
+}
+
+function getCourseStartOffsetMs(course, now) {
+  const [hours, minutes] = course.startTime.split(':').map(value => Number.parseInt(value, 10))
+  const courseStartTime = new Date(now)
+  courseStartTime.setHours(hours || 0, minutes || 0, 0, 0)
+  return courseStartTime.getTime() - now.getTime()
+}
 
 // 将上传的图片文件压缩为 JPEG DataURL（最长边不超过 1200px，质量 0.75）
 function compressImage(file) {
@@ -80,21 +103,66 @@ function Schedule() {
   const [scheduleImage, setScheduleImage] = useState(() => load(IMAGE_KEY, null))
   const [showForm, setShowForm] = useState(false)
   const [editingCourse, setEditingCourse] = useState(null) // course | null
+  const [now, setNow] = useState(() => new Date())
+  const [alarmSoundEnabled, setAlarmSoundEnabled] = useState(() => loadAlarmSoundEnabled())
   const fileInputRef = useRef(null)
   const zipInputRef = useRef(null)
+  const alarmAudioRef = useRef(null)
   const [importStatus, setImportStatus] = useState(null)
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(new Date()), 30000)
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    function syncAlarmSetting() {
+      setAlarmSoundEnabled(loadAlarmSoundEnabled())
+    }
+
+    window.addEventListener('focus', syncAlarmSetting)
+    window.addEventListener('storage', syncAlarmSetting)
+    return () => {
+      window.removeEventListener('focus', syncAlarmSetting)
+      window.removeEventListener('storage', syncAlarmSetting)
+    }
+  }, [])
+
   // 今日课程
-  const todayIndex = new Date().getDay()
+  const todayIndex = now.getDay()
   const todayCourses = [...courses]
     .filter(c => c.dayOfWeek === todayIndex)
     .sort((a, b) => a.startTime.localeCompare(b.startTime))
 
-  const currentTime = `${new Date().getHours().toString().padStart(2, '0')}:${new Date()
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now
     .getMinutes()
     .toString()
     .padStart(2, '0')}`
   const nextCourse = todayCourses.find(c => c.startTime > currentTime)
+
+  useEffect(() => {
+    const todayStr = getBeijingDateString(now)
+    const existingKeys = new Set(loadReminderHistory(todayStr))
+    const dueCourse = todayCourses.find(course => {
+      const reminderKey = getCourseReminderKey(course, todayStr)
+      const offsetMs = getCourseStartOffsetMs(course, now)
+      return offsetMs > 0 && offsetMs <= 10 * 60 * 1000 && !existingKeys.has(reminderKey)
+    })
+
+    if (!dueCourse) {
+      return
+    }
+
+    const reminderKey = getCourseReminderKey(dueCourse, todayStr)
+    existingKeys.add(reminderKey)
+    saveReminderHistory(todayStr, [...existingKeys])
+
+    showWebPopup(
+      '课前提醒',
+      `${dueCourse.courseName} 将在 10 分钟内开始${dueCourse.location ? `，地点：${dueCourse.location}` : ''}`,
+    )
+    playAlarmSound(alarmAudioRef.current, alarmSoundEnabled)
+  }, [alarmSoundEnabled, now, todayCourses])
 
   // 全部课程（按星期 → 时间排序）
   const sortedCourses = [...courses].sort((a, b) => {
@@ -217,6 +285,8 @@ function Schedule() {
 
   return (
     <div className="space-y-8">
+      <audio ref={alarmAudioRef} src={getAlarmAudioSrc()} preload="auto" className="hidden" />
+
       <h1 className="text-2xl font-bold text-gray-800">课表</h1>
 
       {/* ── 今日课程 ── */}

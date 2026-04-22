@@ -9,6 +9,7 @@ const navItems = [
   { to: '/', label: '首页', end: true },
   { to: '/assignments', label: '作业管理' },
   { to: '/pomodoro', label: '番茄钟' },
+  { to: '/resources', label: '资料' },
   {
     href: 'https://blog.nero-lithos.com/courseai/',
     label: '选课助手',

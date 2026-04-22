@@ -21,7 +21,7 @@ function arrayBufferToBase64(buffer) {
 
 function createAlarmAudioSrc() {
   const sampleRate = 22050
-  const durationSeconds = 1.6
+  const durationSeconds = 2.1
   const sampleCount = Math.floor(sampleRate * durationSeconds)
   const wavBuffer = new ArrayBuffer(44 + sampleCount * 2)
   const view = new DataView(wavBuffer)
@@ -42,11 +42,18 @@ function createAlarmAudioSrc() {
 
   for (let index = 0; index < sampleCount; index += 1) {
     const time = index / sampleRate
-    const phaseTime = time % 0.4
-    const frequency = Math.floor(time / 0.4) % 2 === 0 ? 880 : 660
-    const gate = phaseTime < 0.24 ? 1 : 0
-    const envelope = Math.max(0, 1 - time / durationSeconds)
-    const sample = gate * Math.sin(2 * Math.PI * frequency * time) * envelope * 0.45
+    const burstIndex = Math.floor(time / 0.7)
+    const burstTime = time % 0.7
+    const pulseIndex = Math.floor(burstTime / 0.12)
+    const pulseTime = burstTime % 0.12
+    const isActiveBurst = burstIndex < 3
+    const isActivePulse = pulseIndex < 5 && pulseTime < 0.055
+    const gate = isActiveBurst && isActivePulse ? 1 : 0
+    const frequency = 1240
+    const attack = Math.min(1, pulseTime / 0.006)
+    const release = pulseTime < 0.04 ? 1 : Math.max(0, 1 - (pulseTime - 0.04) / 0.015)
+    const envelope = Math.max(0.55, 1 - time / durationSeconds) * attack * release
+    const sample = gate * Math.sin(2 * Math.PI * frequency * time) * envelope * 0.7
     view.setInt16(44 + index * 2, Math.round(sample * 0x7fff), true)
   }
 
@@ -70,12 +77,13 @@ export function saveAlarmSoundEnabled(enabled) {
   return nextValue
 }
 
-export function playAlarmSound(audioElement, enabled) {
+function playAlarmSound(audioElement, enabled) {
   if (!enabled || !audioElement) {
-    return
+    return () => {}
   }
 
   try {
+    audioElement.loop = true
     audioElement.currentTime = 0
     const playResult = audioElement.play()
     if (playResult?.catch) {
@@ -84,11 +92,30 @@ export function playAlarmSound(audioElement, enabled) {
   } catch {
     // Ignore autoplay failures and keep popup reminders working.
   }
+
+  return () => {
+    try {
+      audioElement.pause()
+      audioElement.currentTime = 0
+      audioElement.loop = false
+    } catch {
+      // Ignore audio shutdown failures.
+    }
+  }
 }
 
-export function showWebPopup(title, message) {
+export function triggerWebAlarm(audioElement, enabled, title, message) {
   if (typeof window === 'undefined') {
     return
+  }
+
+  const stopAlarmSound = playAlarmSound(audioElement, enabled)
+  const popupText = message ? `${title}\n${message}` : title
+
+  function stopAfterTimeout() {
+    window.setTimeout(() => {
+      stopAlarmSound()
+    }, 10000)
   }
 
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -96,8 +123,14 @@ export function showWebPopup(title, message) {
       body: message,
       tag: `lguide-${title}`,
     })
+    stopAfterTimeout()
     return
   }
 
-  window.alert(message ? `${title}\n${message}` : title)
+  try {
+    window.alert(popupText)
+    stopAlarmSound()
+  } catch {
+    stopAfterTimeout()
+  }
 }

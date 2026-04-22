@@ -4,8 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import {
   getAlarmAudioSrc,
   loadAlarmSoundEnabled,
-  playAlarmSound,
-  showWebPopup,
+  triggerWebAlarm,
 } from '../../utils/alarm'
 import { getBeijingDateString, getMillisecondsUntilNextBeijingMidnight } from '../../utils/date'
 import { load, save } from '../../utils/storage'
@@ -744,8 +743,7 @@ function Pomodoro() {
   }
 
   function triggerPomodoroReminder(title, message) {
-    showWebPopup(title, message)
-    playAlarmSound(alarmAudioRef.current, alarmSoundEnabled)
+    triggerWebAlarm(alarmAudioRef.current, alarmSoundEnabled, title, message)
   }
 
   function refreshSimulation(alpha = 0.7) {

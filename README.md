@@ -1,4 +1,4 @@
-# LGUide（Campus Study Hub）
+# LGUide (Campus Study Hub)
 
 面向cuhksz大学生的学习工具聚合网站，将常用学习功能集中在一个简洁的页面中。
 
@@ -6,11 +6,11 @@
 
 | 功能 | 状态 |
 |------|------|
-| 首页 Dashboard | 框架完成 |
-| 作业管理 | 框架完成，业务逻辑待实现 |
-| 番茄钟 | 框架完成，计时逻辑待实现 |
-| 课表管理 | 框架完成，录入与查询待实现 |
-| 偏好设置 | 占位完成，功能待实现 |
+| 首页 Dashboard | 完成，已上线 GitHub 风格的热点记录 |
+| 作业管理 | 框架完成 |
+| 番茄钟 | 基础功能和显示互动完成，闹钟提示完成 |
+| 课表管理 | 框架完成，提示功能完成 |
+| 偏好设置 | 占位完成，功能未完全实现 |
 
 ## 技术栈
 
@@ -76,10 +76,15 @@ VITE_POMODORO_API_BASE=https://你的-worker.workers.dev
 
 生产环境推荐在 Cloudflare 给 Worker 配置 Route：`lguide.net/api/*`，这样前端无需额外环境变量。
 
+
+
+推：
+
 git push --force-with-lease
 
-git fetch origin
-git reset --hard origin/main
+拉：
+
+(git fetch origin)
+(git reset --hard origin/main)
 git pull
 
-这句话用于测试

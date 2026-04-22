@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import JSZip from 'jszip'
-import { getAlarmAudioSrc, loadAlarmSoundEnabled, playAlarmSound, showWebPopup } from '../../utils/alarm'
+import { getAlarmAudioSrc, loadAlarmSoundEnabled, triggerWebAlarm } from '../../utils/alarm'
 import { getBeijingDateString } from '../../utils/date'
 import { load, save } from '../../utils/storage'
 import CourseForm, { DAY_NAMES } from './CourseForm'
@@ -157,11 +157,12 @@ function Schedule() {
     existingKeys.add(reminderKey)
     saveReminderHistory(todayStr, [...existingKeys])
 
-    showWebPopup(
+    triggerWebAlarm(
+      alarmAudioRef.current,
+      alarmSoundEnabled,
       '课前提醒',
       `${dueCourse.courseName} 将在 10 分钟内开始${dueCourse.location ? `，地点：${dueCourse.location}` : ''}`,
     )
-    playAlarmSound(alarmAudioRef.current, alarmSoundEnabled)
   }, [alarmSoundEnabled, now, todayCourses])
 
   // 全部课程（按星期 → 时间排序）

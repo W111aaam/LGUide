@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { forceCollide, forceSimulation } from 'd3-force'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import {
   getAlarmAudioSrc,
   loadAlarmSoundEnabled,
@@ -402,6 +403,7 @@ function getInitialTimerState(focusMinutes, todayStr = getBeijingDateString()) {
 
 function Pomodoro() {
   const { user } = useAuth()
+  const { isEnglish } = useLanguage()
   const [todayStr, setTodayStr] = useState(() => getBeijingDateString())
   const [settingsFocusMinutes, setSettingsFocusMinutes] = useState(() =>
     normalizeFocusMinutes(load(FOCUS_MINUTES_KEY, DEFAULT_FOCUS_MINUTES)),
@@ -448,6 +450,40 @@ function Pomodoro() {
   const completedTomatoesStateRef = useRef(initialTimerState.completedTomatoes)
   const transientTomatoesStateRef = useRef(initialTimerState.transientTomatoes)
   const [isDragging, setIsDragging] = useState(false)
+
+  const text = isEnglish
+    ? {
+        saveFailed: error => `Pomodoro completed, but cloud save failed: ${error.message || 'Unknown error'}`,
+        focusDone: 'Focus session finished. Take a 5-minute break.',
+        breakDone: 'Break finished. Start the next pomodoro.',
+        reminderTitle: 'Pomodoro reminder',
+        title: 'Pomodoro',
+        attentionMode: 'Attention mode',
+        relaxMode: 'Relax mode',
+        sceneHint: 'A new tomato drops when focus starts',
+        pause: 'Pause',
+        resume: 'Resume',
+        start: 'Start',
+        reset: 'Reset',
+        todayCompleted: 'Completed today',
+        pomodoros: 'pomodoros',
+      }
+    : {
+        saveFailed: error => `番茄已完成，但云端保存失败：${error.message || '未知错误'}`,
+        focusDone: '专注结束！去休息 5 分钟吧',
+        breakDone: '休息结束！开始下一个番茄',
+        reminderTitle: '番茄钟提醒',
+        title: '番茄钟',
+        attentionMode: '专注模式',
+        relaxMode: '休息模式',
+        sceneHint: '开始专注时会掉下一颗新番茄',
+        pause: '暂停',
+        resume: '继续',
+        start: '开始',
+        reset: '重置',
+        todayCompleted: '今日已完成',
+        pomodoros: '个番茄',
+      }
 
   useEffect(() => {
     modeRef.current = mode
@@ -708,22 +744,23 @@ function Pomodoro() {
           endedAt: endedAt.toISOString(),
           durationSeconds,
         })
-          .catch(error => showNotification(`番茄已完成，但云端保存失败：${error.message || '未知错误'}`))
+          .catch(error => showNotification(text.saveFailed(error)))
       }
       setMode('break')
       setTimeLeft(BREAK_MINUTES * 60)
       setDurationSeconds(BREAK_MINUTES * 60)
-      showNotification('专注结束！去休息 5 分钟吧')
-      triggerPomodoroReminder('番茄钟提醒', '专注结束！去休息 5 分钟吧')
+      showNotification(text.focusDone)
+      triggerPomodoroReminder(text.reminderTitle, text.focusDone)
     } else {
       focusTomatoSpawnedRef.current = false
       setMode('focus')
       setTimeLeft(settingsFocusMinutes * 60)
       setDurationSeconds(settingsFocusMinutes * 60)
-      showNotification('休息结束！开始下一个番茄')
-      triggerPomodoroReminder('番茄钟提醒', '休息结束！开始下一个番茄')
+      showNotification(text.breakDone)
+      triggerPomodoroReminder(text.reminderTitle, text.breakDone)
     }
   }, [
+    text,
     timeLeft,
     status,
     mode,
@@ -1078,7 +1115,7 @@ function Pomodoro() {
     <div className="pomodoro-page space-y-4">
       <audio ref={alarmAudioRef} src={getAlarmAudioSrc()} preload="auto" className="hidden" />
 
-      <h1 className="pomodoro-title text-2xl font-bold">番茄钟</h1>
+      <h1 className="pomodoro-title text-2xl font-bold">{text.title}</h1>
 
       {/* 倒计时结束通知 */}
       {notification && (
@@ -1100,7 +1137,7 @@ function Pomodoro() {
             Focus Gravity
           </div>
           <div className="pomodoro-scene-hint absolute right-6 top-6 text-sm">
-            开始专注时会掉下一颗新番茄
+            {text.sceneHint}
           </div>
 
           {tomatoNodes.map(node => {
@@ -1301,7 +1338,7 @@ function Pomodoro() {
                     isFocus ? 'is-active is-focus' : ''
                   }`}
                 >
-                  专注模式
+                  {text.attentionMode}
                 </button>
                 <button
                   onClick={() => handleSwitchMode('break')}
@@ -1309,7 +1346,7 @@ function Pomodoro() {
                     !isFocus ? 'is-active is-break' : ''
                   }`}
                 >
-                  休息模式
+                  {text.relaxMode}
                 </button>
               </div>
             </div>
@@ -1354,28 +1391,28 @@ function Pomodoro() {
                   onClick={handlePause}
                   className={`pomodoro-action-button ${activeModeClass} px-7 py-2.5 rounded-full font-medium transition-colors`}
                 >
-                  暂停
+                  {text.pause}
                 </button>
               ) : (
                 <button
                   onClick={handleStart}
                   className={`pomodoro-action-button ${activeModeClass} px-7 py-2.5 rounded-full font-medium transition-colors`}
                 >
-                  {status === 'paused' ? '继续' : '开始'}
+                  {status === 'paused' ? text.resume : text.start}
                 </button>
               )}
               <button
                 onClick={handleReset}
                 className="pomodoro-reset-button px-7 py-2.5 rounded-full font-medium transition-colors"
               >
-                重置
+                {text.reset}
               </button>
             </div>
 
             <p className="pomodoro-count-text mt-5 text-sm">
-              今日已完成{' '}
+              {text.todayCompleted}{' '}
               <span className="pomodoro-count-number font-bold text-base">{todayCount}</span>{' '}
-              个番茄
+              {text.pomodoros}
             </p>
           </div>
         </div>

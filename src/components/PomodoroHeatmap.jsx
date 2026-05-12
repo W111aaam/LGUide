@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import { getBeijingDateString, getBeijingYear } from '../utils/date'
 import {
   fetchPomodoroHeatmap,
@@ -24,10 +25,15 @@ function getHeatLevel(minutes) {
   return 4
 }
 
-function formatDuration(seconds) {
+function formatDuration(seconds, isEnglish) {
   const totalMinutes = Math.round((seconds || 0) / 60)
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
+  if (isEnglish) {
+    if (!hours) return `${minutes} min`
+    if (!minutes) return `${hours} h`
+    return `${hours} h ${minutes} min`
+  }
   if (!hours) return `${minutes} 分钟`
   if (!minutes) return `${hours} 小时`
   return `${hours} 小时 ${minutes} 分钟`
@@ -42,6 +48,7 @@ const TOOLTIP_SIZE = {
 
 function PomodoroHeatmap() {
   const { user } = useAuth()
+  const { isEnglish } = useLanguage()
   const sectionRef = useRef(null)
   const [days, setDays] = useState([])
   const [stats, setStats] = useState(null)
@@ -50,6 +57,23 @@ function PomodoroHeatmap() {
   const [tooltip, setTooltip] = useState(null)
   const year = getBeijingYear()
   const todayDate = getBeijingDateString()
+  const text = {
+    title: isEnglish ? 'Focus Heatmap' : '番茄投入热力图',
+    refreshing: isEnglish ? 'Refreshing...' : '同步中...',
+    refresh: isEnglish ? 'Refresh' : '刷新',
+    totalFocus: isEnglish ? 'Total focus' : '累计专注',
+    completedPomodoros: isEnglish ? 'Completed pomodoros' : '完成番茄',
+    currentYear: isEnglish ? 'Year' : '当前年份',
+    loginHint: isEnglish ? 'Log in to view and sync your cloud pomodoro heatmap.' : '登录后可查看并同步云端番茄热力图。',
+    cloudErrorPrefix: isEnglish ? 'Cloudflare D1 is temporarily unavailable, so the page will keep using local pomodoro data:' : '暂时连不上 Cloudflare D1，页面会继续使用本地番茄计数：',
+    syncFailed: isEnglish ? 'Sync failed' : '同步失败',
+    ariaLabel: isEnglish ? `${year} pomodoro heatmap` : `${year} 番茄钟热力图`,
+    low: isEnglish ? 'Less' : '少',
+    high: isEnglish ? 'More' : '多',
+    minuteUnit: isEnglish ? 'min' : '分钟',
+    pomodoroUnit: isEnglish ? 'pomodoros' : '个番茄',
+    monthLabels: isEnglish ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+  }
 
   function showTooltip(cell, target) {
     const section = sectionRef.current
@@ -100,11 +124,11 @@ function PomodoroHeatmap() {
       setStats(remoteStats)
       setError('')
     } catch (err) {
-      setError(err.message || '同步失败')
+      setError(err.message || text.syncFailed)
     } finally {
       setIsLoading(false)
     }
-  }, [user, year])
+  }, [text.syncFailed, user, year])
 
   useEffect(() => {
     refreshHistory()
@@ -133,7 +157,6 @@ function PomodoroHeatmap() {
       }
     }),
   ]
-  const monthLabels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   const totalSeconds = stats?.totals?.total_seconds || 0
   const completedCount = stats?.totals?.completed_count || 0
 
@@ -145,55 +168,55 @@ function PomodoroHeatmap() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-orange-400">Tomato Heatmap</p>
-          <h2 className="mt-2 text-xl font-bold text-gray-900 dark:text-slate-100">番茄投入热力图</h2>
+          <h2 className="mt-2 text-xl font-bold text-gray-900 dark:text-slate-100">{text.title}</h2>
         </div>
         <button
           type="button"
           onClick={refreshHistory}
           className="self-start rounded-full border border-orange-200 px-4 py-2 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50 dark:border-orange-400/30 dark:text-orange-300 dark:hover:bg-orange-400/10"
         >
-          {isLoading ? '同步中...' : '刷新'}
+          {isLoading ? text.refreshing : text.refresh}
         </button>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl bg-orange-50 px-4 py-3 dark:bg-orange-400/10">
-          <p className="text-xs text-orange-500 dark:text-orange-300">累计专注</p>
-          <p className="mt-1 text-lg font-bold text-orange-950 dark:text-orange-50">{formatDuration(totalSeconds)}</p>
+          <p className="text-xs text-orange-500 dark:text-orange-300">{text.totalFocus}</p>
+          <p className="mt-1 text-lg font-bold text-orange-950 dark:text-orange-50">{formatDuration(totalSeconds, isEnglish)}</p>
         </div>
         <div className="rounded-2xl bg-red-50 px-4 py-3 dark:bg-red-400/10">
-          <p className="text-xs text-red-500 dark:text-red-300">完成番茄</p>
-          <p className="mt-1 text-lg font-bold text-red-950 dark:text-red-50">{completedCount} 个</p>
+          <p className="text-xs text-red-500 dark:text-red-300">{text.completedPomodoros}</p>
+          <p className="mt-1 text-lg font-bold text-red-950 dark:text-red-50">{completedCount} {text.pomodoroUnit}</p>
         </div>
         <div className="rounded-2xl bg-amber-50 px-4 py-3 dark:bg-amber-400/10">
-          <p className="text-xs text-amber-600 dark:text-amber-300">当前年份</p>
+          <p className="text-xs text-amber-600 dark:text-amber-300">{text.currentYear}</p>
           <p className="mt-1 text-lg font-bold text-amber-950 dark:text-amber-50">{year}</p>
         </div>
       </div>
 
       {!user && (
         <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
-          登录后可查看并同步云端番茄热力图。
+          {text.loginHint}
         </div>
       )}
 
       {error && (
         <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200">
-          暂时连不上 Cloudflare D1，页面会继续使用本地番茄计数：{error}
+          {text.cloudErrorPrefix} {error}
         </div>
       )}
 
       <div className="mt-5 overflow-x-auto pb-2">
         <div className="min-w-[760px]">
           <div className="mb-2 grid grid-cols-12 text-xs font-semibold text-gray-400 dark:text-slate-500">
-            {monthLabels.map(label => (
+            {text.monthLabels.map(label => (
               <span key={label}>{label}</span>
             ))}
           </div>
           <div
             className="grid grid-flow-col grid-rows-7 gap-[5px]"
             style={{ gridAutoColumns: '12px' }}
-            aria-label={`${year} 番茄钟热力图`}
+            aria-label={text.ariaLabel}
           >
             {cells.map(cell => (
               cell.blank ? (
@@ -201,7 +224,7 @@ function PomodoroHeatmap() {
               ) : (
                 <span
                   key={cell.id}
-                  aria-label={`${cell.date}，${cell.minutes} 分钟，${cell.count} 个番茄`}
+                  aria-label={isEnglish ? `${cell.date}, ${cell.minutes} min, ${cell.count} pomodoros` : `${cell.date}，${cell.minutes} 分钟，${cell.count} 个番茄`}
                   tabIndex={0}
                   onMouseEnter={event => showTooltip(cell, event.currentTarget)}
                   onMouseLeave={() => setTooltip(null)}
@@ -221,7 +244,7 @@ function PomodoroHeatmap() {
             ))}
           </div>
           <div className="mt-3 flex items-center justify-end gap-2 text-xs text-gray-400 dark:text-slate-500">
-            <span>少</span>
+            <span>{text.low}</span>
             {[0, 1, 2, 3, 4].map(level => (
               <span
                 key={level}
@@ -235,7 +258,7 @@ function PomodoroHeatmap() {
                 ].filter(Boolean).join(' ')}
               />
             ))}
-            <span>多</span>
+            <span>{text.high}</span>
           </div>
         </div>
       </div>
@@ -251,8 +274,8 @@ function PomodoroHeatmap() {
           role="tooltip"
         >
           <div className="font-semibold text-black dark:text-white">{tooltip.date}</div>
-          <div className="text-black dark:text-slate-300">{tooltip.minutes} 分钟</div>
-          <div className="text-black dark:text-slate-300">{tooltip.count} 个番茄</div>
+          <div className="text-black dark:text-slate-300">{tooltip.minutes} {text.minuteUnit}</div>
+          <div className="text-black dark:text-slate-300">{tooltip.count} {text.pomodoroUnit}</div>
           <span
             className={[
               'absolute left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-black bg-white dark:border-slate-500 dark:bg-slate-950',

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import JSZip from 'jszip'
+import { useLanguage } from '../../context/LanguageContext'
 import { getAlarmAudioSrc, loadAlarmSoundEnabled, triggerWebAlarm } from '../../utils/alarm'
 import { getBeijingDateString } from '../../utils/date'
 import { load, save } from '../../utils/storage'
-import CourseForm, { DAY_NAMES } from './CourseForm'
+import CourseForm, { DAY_NAMES_EN, DAY_NAMES_ZH } from './CourseForm'
 import { parseIcsEvents } from './parseIcs'
 
 const COURSES_KEY = 'courses'
@@ -59,22 +60,22 @@ function compressImage(file) {
 
 // ---- 单条课程卡片 ----
 
-function CourseCard({ course, onEdit, onDelete }) {
+function CourseCard({ course, dayNames, text, onEdit, onDelete }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-medium text-gray-800">{course.courseName}</p>
           <p className="text-sm text-gray-500 mt-0.5">
-            {DAY_NAMES[course.dayOfWeek]}&nbsp;&nbsp;
+            {dayNames[course.dayOfWeek]}&nbsp;&nbsp;
             {course.startTime}–{course.endTime}
             {course.location && ` · ${course.location}`}
           </p>
           {course.teacher && (
-            <p className="text-xs text-gray-400 mt-0.5">教师：{course.teacher}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{text.teacher}: {course.teacher}</p>
           )}
           {course.note && (
-            <p className="text-xs text-gray-400 mt-0.5">备注：{course.note}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{text.note}: {course.note}</p>
           )}
         </div>
         <div className="flex gap-3 flex-shrink-0 mt-0.5">
@@ -82,13 +83,13 @@ function CourseCard({ course, onEdit, onDelete }) {
             onClick={onEdit}
             className="text-xs text-indigo-500 hover:text-indigo-700 transition-colors"
           >
-            编辑
+            {text.edit}
           </button>
           <button
             onClick={onDelete}
             className="text-xs text-gray-300 hover:text-red-500 transition-colors"
           >
-            删除
+            {text.delete}
           </button>
         </div>
       </div>
@@ -99,6 +100,7 @@ function CourseCard({ course, onEdit, onDelete }) {
 // ---- 主页面 ----
 
 function Schedule() {
+  const { isEnglish } = useLanguage()
   const [courses, setCourses] = useState(() => load(COURSES_KEY, []))
   const [scheduleImage, setScheduleImage] = useState(() => load(IMAGE_KEY, null))
   const [showForm, setShowForm] = useState(false)
@@ -109,6 +111,71 @@ function Schedule() {
   const zipInputRef = useRef(null)
   const alarmAudioRef = useRef(null)
   const [importStatus, setImportStatus] = useState(null)
+
+  const text = isEnglish
+    ? {
+        reminderTitle: 'Upcoming class',
+        reminderMessage: course => `${course.courseName} starts in 10 minutes${course.location ? `, location: ${course.location}` : ''}`,
+        imageUploadFailed: 'Image processing failed. Please try again.',
+        zipMissing: 'No .ics file was found in the zip archive.',
+        noEvents: 'No class events were parsed. Please check the .ics file format.',
+        importDone: (parsed, added, skipped) => `Import complete: parsed ${parsed} events, added ${added} classes${skipped > 0 ? `, skipped ${skipped} duplicates` : ''}`,
+        importFailed: message => `Import failed: ${message}`,
+        title: 'Schedule',
+        todayClasses: 'Today classes',
+        noClassesToday: 'No classes today',
+        nextClass: 'Next class',
+        location: 'Location',
+        noCourseAdd: 'No classes today yet. Add your schedule to get started.',
+        noCourseLater: 'No more classes later today. Use the remaining time well.',
+        scheduleImage: 'Schedule image',
+        replaceImage: 'Replace image',
+        uploadImage: 'Upload image',
+        scheduleImageAlt: 'Schedule image',
+        deleteImage: 'Delete image',
+        clickUpload: 'Click to upload a schedule image',
+        imageFormat: 'Supports JPG / PNG',
+        allCourses: 'All courses',
+        importZip: 'Import ICS zip from SIS',
+        manualAdd: 'Add course manually',
+        emptyCourses: 'No courses yet. Use the button in the top right to add one.',
+        teacher: 'Instructor',
+        note: 'Note',
+        edit: 'Edit',
+        delete: 'Delete',
+      }
+    : {
+        reminderTitle: '课前提醒',
+        reminderMessage: course => `${course.courseName} 将在 10 分钟内开始${course.location ? `，地点：${course.location}` : ''}`,
+        imageUploadFailed: '图片处理失败，请重试',
+        zipMissing: '压缩包中未找到 .ics 文件',
+        noEvents: '未解析到任何课程事件，请检查 .ics 文件格式',
+        importDone: (parsed, added, skipped) => `导入完成：解析 ${parsed} 条事件，新增 ${added} 门课程${skipped > 0 ? `，跳过重复 ${skipped} 条` : ''}`,
+        importFailed: message => `解析失败：${message}`,
+        title: '课表',
+        todayClasses: '今日课程',
+        noClassesToday: '今天没有课',
+        nextClass: '下一节课',
+        location: '地点',
+        noCourseAdd: '今天没有课程，快去添加你的课表吧。',
+        noCourseLater: '今天已经没有后续课程了，祝你剩余时间高效。',
+        scheduleImage: '课表截图',
+        replaceImage: '替换图片',
+        uploadImage: '上传截图',
+        scheduleImageAlt: '课表截图',
+        deleteImage: '删除图片',
+        clickUpload: '点击上传课表截图',
+        imageFormat: '支持 JPG / PNG 格式',
+        allCourses: '全部课程',
+        importZip: '导入 sis 系统下载的 ICS zip',
+        manualAdd: '手动添加课程',
+        emptyCourses: '暂无课程，点击右上角添加',
+        teacher: '教师',
+        note: '备注',
+        edit: '编辑',
+        delete: '删除',
+      }
+  const dayNames = isEnglish ? DAY_NAMES_EN : DAY_NAMES_ZH
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30000)
@@ -160,10 +227,10 @@ function Schedule() {
     triggerWebAlarm(
       alarmAudioRef.current,
       alarmSoundEnabled,
-      '课前提醒',
-      `${dueCourse.courseName} 将在 10 分钟内开始${dueCourse.location ? `，地点：${dueCourse.location}` : ''}`,
+      text.reminderTitle,
+      text.reminderMessage(dueCourse),
     )
-  }, [alarmSoundEnabled, now, todayCourses])
+  }, [alarmSoundEnabled, now, text, todayCourses])
 
   // 全部课程（按星期 → 时间排序）
   const sortedCourses = [...courses].sort((a, b) => {
@@ -181,7 +248,7 @@ function Schedule() {
       setScheduleImage(dataUrl)
       save(IMAGE_KEY, dataUrl)
     } catch {
-      alert('图片处理失败，请重试')
+      alert(text.imageUploadFailed)
     }
     e.target.value = '' // 允许重复选同一文件
   }
@@ -215,7 +282,7 @@ function Schedule() {
         f => !f.dir && f.name.toLowerCase().endsWith('.ics')
       )
       if (icsFiles.length === 0) {
-        showImportStatus('压缩包中未找到 .ics 文件', true)
+        showImportStatus(text.zipMissing, true)
         return
       }
       const allImported = []
@@ -224,7 +291,7 @@ function Schedule() {
         allImported.push(...parseIcsEvents(text))
       }
       if (allImported.length === 0) {
-        showImportStatus('未解析到任何课程事件，请检查 .ics 文件格式', true)
+        showImportStatus(text.noEvents, true)
         return
       }
       const current = load(COURSES_KEY, [])
@@ -234,11 +301,11 @@ function Schedule() {
       setCourses(merged)
       save(COURSES_KEY, merged)
       showImportStatus(
-        `导入完成：解析 ${allImported.length} 条事件，新增 ${addedCount} 门课程${skipped > 0 ? `，跳过重复 ${skipped} 条` : ''}`,
+        text.importDone(allImported.length, addedCount, skipped),
         false
       )
     } catch (err) {
-      showImportStatus(`解析失败：${err.message}`, true)
+      showImportStatus(text.importFailed(err.message), true)
     }
   }
 
@@ -288,16 +355,16 @@ function Schedule() {
     <div className="space-y-8">
       <audio ref={alarmAudioRef} src={getAlarmAudioSrc()} preload="auto" className="hidden" />
 
-      <h1 className="text-2xl font-bold text-gray-800">课表</h1>
+      <h1 className="text-2xl font-bold text-gray-800">{text.title}</h1>
 
       {/* ── 今日课程 ── */}
       <section>
         <h2 className="text-base font-semibold text-gray-600 mb-3">
-          今日课程 · {DAY_NAMES[todayIndex]}
+          {text.todayClasses} · {dayNames[todayIndex]}
         </h2>
         {todayCourses.length === 0 ? (
           <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-            <p className="text-gray-400 text-sm">今天没有课</p>
+            <p className="text-gray-400 text-sm">{text.noClassesToday}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -325,7 +392,7 @@ function Schedule() {
 
       {/* ── 下一节课 ── */}
       <section>
-        <h2 className="text-base font-semibold text-gray-600 mb-3">下一节课</h2>
+        <h2 className="text-base font-semibold text-gray-600 mb-3">{text.nextClass}</h2>
         {nextCourse ? (
           <div className="bg-white border border-indigo-200 rounded-2xl p-5">
             <p className="text-base font-semibold text-gray-800">{nextCourse.courseName}</p>
@@ -333,14 +400,14 @@ function Schedule() {
               {nextCourse.startTime}–{nextCourse.endTime}
             </p>
             {nextCourse.location && (
-              <p className="text-sm text-gray-500 mt-1">地点：{nextCourse.location}</p>
+              <p className="text-sm text-gray-500 mt-1">{text.location}: {nextCourse.location}</p>
             )}
           </div>
         ) : (
           <div className="bg-white border border-gray-200 rounded-xl p-5 text-gray-500 text-sm">
             {todayCourses.length === 0
-              ? '今天没有课程，快去添加你的课表吧。'
-              : '今天已经没有后续课程了，祝你剩余时间高效。'}
+              ? text.noCourseAdd
+              : text.noCourseLater}
           </div>
         )}
       </section>
@@ -348,12 +415,12 @@ function Schedule() {
       {/* ── 课表截图 ── */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-600">课表截图</h2>
+          <h2 className="text-base font-semibold text-gray-600">{text.scheduleImage}</h2>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
           >
-            {scheduleImage ? '替换图片' : '上传截图'}
+            {scheduleImage ? text.replaceImage : text.uploadImage}
           </button>
         </div>
 
@@ -376,14 +443,14 @@ function Schedule() {
           <div className="space-y-2">
             <img
               src={scheduleImage}
-              alt="课表截图"
+              alt={text.scheduleImageAlt}
               className="w-full rounded-xl border border-gray-200 object-contain max-h-[500px]"
             />
             <button
               onClick={handleDeleteImage}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors"
             >
-              删除图片
+              {text.deleteImage}
             </button>
           </div>
         ) : (
@@ -391,8 +458,8 @@ function Schedule() {
             onClick={() => fileInputRef.current?.click()}
             className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-indigo-300 transition-colors"
           >
-            <p className="text-gray-500 text-sm font-medium">点击上传课表截图</p>
-            <p className="text-gray-400 text-xs mt-1">支持 JPG / PNG 格式</p>
+            <p className="text-gray-500 text-sm font-medium">{text.clickUpload}</p>
+            <p className="text-gray-400 text-xs mt-1">{text.imageFormat}</p>
           </div>
         )}
       </section>
@@ -401,7 +468,7 @@ function Schedule() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-gray-600">
-            全部课程
+            {text.allCourses}
             {courses.length > 0 && (
               <span className="ml-1.5 text-gray-400 font-normal">
                 · {courses.length}
@@ -414,13 +481,13 @@ function Schedule() {
                 onClick={() => zipInputRef.current?.click()}
                 className="text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-4 py-1.5 rounded-lg transition-colors"
               >
-                导入 sis 系统下载的 ICS zip
+                {text.importZip}
               </button>
               <button
                 onClick={() => setShowForm(true)}
                 className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg transition-colors"
               >
-                手动添加课程
+                {text.manualAdd}
               </button>
             </div>
           )}
@@ -456,7 +523,7 @@ function Schedule() {
 
         {sortedCourses.length === 0 ? (
           <div className="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
-            <p className="text-gray-400 text-sm">暂无课程，点击右上角添加</p>
+            <p className="text-gray-400 text-sm">{text.emptyCourses}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -464,6 +531,8 @@ function Schedule() {
               <CourseCard
                 key={course.id}
                 course={course}
+                dayNames={dayNames}
+                text={text}
                 onEdit={() => handleStartEdit(course)}
                 onDelete={() => handleDeleteCourse(course.id)}
               />

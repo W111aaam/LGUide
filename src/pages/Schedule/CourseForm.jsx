@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useLanguage } from '../../context/LanguageContext'
 
-export const DAY_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+export const DAY_NAMES_ZH = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+export const DAY_NAMES_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const EMPTY_FORM = {
   courseName: '',
@@ -14,7 +16,29 @@ const EMPTY_FORM = {
 
 // initial 传入时为编辑模式，不传为新增模式
 function CourseForm({ initial, onSubmit, onCancel }) {
+  const { isEnglish } = useLanguage()
   const [form, setForm] = useState(initial ?? EMPTY_FORM)
+
+  const dayNames = isEnglish ? DAY_NAMES_EN : DAY_NAMES_ZH
+  const text = isEnglish
+    ? {
+        courseName: 'Course name *',
+        location: 'Location',
+        teacher: 'Instructor',
+        note: 'Note (optional)',
+        save: 'Save changes',
+        add: 'Add course',
+        cancel: 'Cancel',
+      }
+    : {
+        courseName: '课程名称 *',
+        location: '上课地点',
+        teacher: '授课教师',
+        note: '备注（可选）',
+        save: '保存修改',
+        add: '确认添加',
+        cancel: '取消',
+      }
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }))
@@ -37,7 +61,7 @@ function CourseForm({ initial, onSubmit, onCancel }) {
       <div className="grid grid-cols-2 gap-2">
         <input
           className={`${inputClass} col-span-2`}
-          placeholder="课程名称 *"
+          placeholder={text.courseName}
           value={form.courseName}
           onChange={e => set('courseName', e.target.value)}
         />
@@ -46,13 +70,13 @@ function CourseForm({ initial, onSubmit, onCancel }) {
           value={form.dayOfWeek}
           onChange={e => set('dayOfWeek', Number(e.target.value))}
         >
-          {DAY_NAMES.map((name, i) => (
+          {dayNames.map((name, i) => (
             <option key={i} value={i}>{name}</option>
           ))}
         </select>
         <input
           className={inputClass}
-          placeholder="上课地点"
+          placeholder={text.location}
           value={form.location}
           onChange={e => set('location', e.target.value)}
         />
@@ -70,13 +94,13 @@ function CourseForm({ initial, onSubmit, onCancel }) {
         />
         <input
           className={inputClass}
-          placeholder="授课教师"
+          placeholder={text.teacher}
           value={form.teacher}
           onChange={e => set('teacher', e.target.value)}
         />
         <input
           className={inputClass}
-          placeholder="备注（可选）"
+          placeholder={text.note}
           value={form.note}
           onChange={e => set('note', e.target.value)}
         />
@@ -87,14 +111,14 @@ function CourseForm({ initial, onSubmit, onCancel }) {
           type="submit"
           className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg transition-colors"
         >
-          {initial ? '保存修改' : '确认添加'}
+          {initial ? text.save : text.add}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="text-sm text-gray-500 hover:text-gray-700 px-4 py-1.5 rounded-lg transition-colors"
         >
-          取消
+          {text.cancel}
         </button>
       </div>
     </form>

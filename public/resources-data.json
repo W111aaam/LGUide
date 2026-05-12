@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-22T05:23:39.804Z",
+  "generatedAt": "2026-05-12T04:04:41.316Z",
   "sourceRepo": "Nerolithos/CUHKSZ_SDS_EXAMS",
   "branch": "main",
   "items": [
@@ -196,38 +196,66 @@
       ]
     },
     {
-      "name": "CSC3060",
-      "path": "CSC3060",
+      "name": "CSC3050:3060",
+      "path": "CSC3050:3060",
       "type": "dir",
-      "fileCount": 4,
+      "fileCount": 8,
       "files": [
         {
           "name": "3060Quiz1-2026 key.docx",
-          "path": "CSC3060/3060Quiz1-2026 key.docx",
+          "path": "CSC3050:3060/3060Quiz1-2026 key.docx",
           "size": 74760,
-          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/3060Quiz1-2026%20key.docx",
-          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/3060Quiz1-2026%20key.docx"
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/3060Quiz1-2026%20key.docx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/3060Quiz1-2026%20key.docx"
         },
         {
           "name": "3060Quiz2-2026.key.docx",
-          "path": "CSC3060/3060Quiz2-2026.key.docx",
+          "path": "CSC3050:3060/3060Quiz2-2026.key.docx",
           "size": 180587,
-          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/3060Quiz2-2026.key.docx",
-          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/3060Quiz2-2026.key.docx"
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/3060Quiz2-2026.key.docx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/3060Quiz2-2026.key.docx"
+        },
+        {
+          "name": "CSC3050_2025SpringFinaldocx.docx",
+          "path": "CSC3050:3060/CSC3050_2025SpringFinaldocx.docx",
+          "size": 33916,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/CSC3050_2025SpringFinaldocx.docx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/CSC3050_2025SpringFinaldocx.docx"
+        },
+        {
+          "name": "PopQuiz1.pptx",
+          "path": "CSC3050:3060/PopQuiz1.pptx",
+          "size": 215504,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/PopQuiz1.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/PopQuiz1.pptx"
+        },
+        {
+          "name": "PopQuiz2.pptx",
+          "path": "CSC3050:3060/PopQuiz2.pptx",
+          "size": 303566,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/PopQuiz2.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/PopQuiz2.pptx"
         },
         {
           "name": "PopQuiz3-2026.pptx",
-          "path": "CSC3060/PopQuiz3-2026.pptx",
+          "path": "CSC3050:3060/PopQuiz3-2026.pptx",
           "size": 327107,
-          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/PopQuiz3-2026.pptx",
-          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/PopQuiz3-2026.pptx"
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/PopQuiz3-2026.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/PopQuiz3-2026.pptx"
         },
         {
           "name": "PopQuiz4-2026.pptx",
-          "path": "CSC3060/PopQuiz4-2026.pptx",
+          "path": "CSC3050:3060/PopQuiz4-2026.pptx",
           "size": 243358,
-          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3060/PopQuiz4-2026.pptx",
-          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3060/PopQuiz4-2026.pptx"
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/PopQuiz4-2026.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/PopQuiz4-2026.pptx"
+        },
+        {
+          "name": "PopQuiz5-2026.pptx",
+          "path": "CSC3050:3060/PopQuiz5-2026.pptx",
+          "size": 196245,
+          "downloadUrl": "https://raw.githubusercontent.com/Nerolithos/CUHKSZ_SDS_EXAMS/main/CSC3050%3A3060/PopQuiz5-2026.pptx",
+          "htmlUrl": "https://github.com/Nerolithos/CUHKSZ_SDS_EXAMS/blob/main/CSC3050%3A3060/PopQuiz5-2026.pptx"
         }
       ]
     },

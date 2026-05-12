@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PomodoroHeatmap from '../../components/PomodoroHeatmap'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import { getBeijingDateString, getBeijingDayOfWeek, getBeijingYear, getMillisecondsUntilNextBeijingMidnight } from '../../utils/date'
 import { load } from '../../utils/storage'
 import { fetchPomodoroHeatmap } from '../../utils/pomodoroApi'
@@ -42,6 +43,7 @@ function QuickLink({ to, label }) {
 
 function Dashboard() {
   const { user } = useAuth()
+  const { isEnglish } = useLanguage()
   const [todayStr, setTodayStr] = useState(() => getBeijingDateString())
   const currentTime = getCurrentTime()
   const currentBeijingYear = getBeijingYear()
@@ -69,6 +71,48 @@ function Dashboard() {
   const nextCourse = todayCourses.find(
     c => parseTimeToMinutes(c.startTime) > currentMinutes
   )
+
+  const text = isEnglish
+    ? {
+        title: 'Home',
+        todayAssignments: 'Today assignments',
+        dueHint: `Due today ${todayDueCount}, pending ${pendingCount}`,
+        todayCourses: 'Today classes',
+        coursesUnit: 'classes',
+        remainingCoursesHint: 'Remaining classes today',
+        todayFocus: 'Today focus',
+        minutes: 'min',
+        todayTomatoHint: `Completed ${todayTomato} pomodoros today`,
+        nextClass: 'Next class',
+        location: 'Location',
+        noCourseAdd: 'No classes today yet. Add your schedule to get started.',
+        noCourseLater: 'No more classes left today. Use the remaining time well.',
+        quickActions: 'Quick actions',
+        assignments: 'Assignments',
+        startFocus: 'Start focus',
+        viewSchedule: 'View schedule',
+        preferences: 'Preferences',
+      }
+    : {
+        title: '首页',
+        todayAssignments: '今日作业',
+        dueHint: `今日到期 ${todayDueCount}，剩余 ${pendingCount}`,
+        todayCourses: '今日课程',
+        coursesUnit: '门',
+        remainingCoursesHint: '今日剩余课程',
+        todayFocus: '今日专注',
+        minutes: '分钟',
+        todayTomatoHint: `今日完成 ${todayTomato} 个番茄`,
+        nextClass: '下一节课',
+        location: '地点',
+        noCourseAdd: '今天没有课程，快去课表中添加你的课程安排。',
+        noCourseLater: '今天已经没有后续课程了，祝你接下来的时间高效。',
+        quickActions: '快速入口',
+        assignments: '作业管理',
+        startFocus: '开始专注',
+        viewSchedule: '查看课表',
+        preferences: '偏好设置',
+      }
 
   useEffect(() => {
     function syncBeijingDay() {
@@ -129,28 +173,28 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">首页</h1>
+      <h1 className="text-2xl font-bold text-gray-800">{text.title}</h1>
 
       <div className="grid grid-cols-3 gap-4">
         <StatCard
-          title="今日作业"
+          title={text.todayAssignments}
           value={`${todayDueCount} / ${pendingCount}`}
-          hint={`今日到期 ${todayDueCount}，剩余 ${pendingCount}`}
+          hint={text.dueHint}
         />
         <StatCard
-          title="今日课程"
-          value={`${remainingCourses} 门`}
-          hint="今日剩余课程"
+          title={text.todayCourses}
+          value={`${remainingCourses} ${text.coursesUnit}`}
+          hint={text.remainingCoursesHint}
         />
         <StatCard
-          title="今日专注"
-          value={`${todayFocusMinutes} 分钟`}
-          hint={`今日完成 ${todayTomato} 个番茄`}
+          title={text.todayFocus}
+          value={`${todayFocusMinutes} ${text.minutes}`}
+          hint={text.todayTomatoHint}
         />
       </div>
 
       <section className="bg-white border border-indigo-200 rounded-2xl p-5">
-        <h2 className="text-base font-semibold text-gray-800 mb-2">下一节课</h2>
+        <h2 className="text-base font-semibold text-gray-800 mb-2">{text.nextClass}</h2>
         {nextCourse ? (
           <div>
             <p className="text-lg font-semibold text-gray-900">
@@ -161,15 +205,15 @@ function Dashboard() {
             </p>
             {nextCourse.location && (
               <p className="text-sm text-gray-500 mt-1">
-                地点：{nextCourse.location}
+                {text.location}: {nextCourse.location}
               </p>
             )}
           </div>
         ) : (
           <p className="text-sm text-gray-500">
             {todayCourses.length === 0
-              ? '今天没有课程，快去课表中添加你的课程安排。'
-              : '今天已经没有后续课程了，祝你接下来的时间高效。'}
+              ? text.noCourseAdd
+              : text.noCourseLater}
           </p>
         )}
       </section>
@@ -177,12 +221,12 @@ function Dashboard() {
       <PomodoroHeatmap />
 
       <div>
-        <h2 className="text-base font-semibold text-gray-600 mb-3">快速入口</h2>
+        <h2 className="text-base font-semibold text-gray-600 mb-3">{text.quickActions}</h2>
         <div className="grid grid-cols-4 gap-3">
-          <QuickLink to="/assignments" label="作业管理" />
-          <QuickLink to="/pomodoro" label="开始专注" />
-          <QuickLink to="/schedule" label="查看课表" />
-          <QuickLink to="/settings" label="偏好设置" />
+          <QuickLink to="/assignments" label={text.assignments} />
+          <QuickLink to="/pomodoro" label={text.startFocus} />
+          <QuickLink to="/schedule" label={text.viewSchedule} />
+          <QuickLink to="/settings" label={text.preferences} />
         </div>
       </div>
     </div>

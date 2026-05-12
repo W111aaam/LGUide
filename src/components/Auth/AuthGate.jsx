@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 
 function AuthGate({ isOpen, onClose }) {
   const { login, register } = useAuth()
+  const { isEnglish } = useLanguage()
   const [mode, setMode] = useState('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -10,6 +12,48 @@ function AuthGate({ isOpen, onClose }) {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isBouncing, setIsBouncing] = useState(false)
+
+  const text = isEnglish
+    ? {
+        passwordsMismatch: 'The two passwords do not match.',
+        authFailed: 'Authentication failed.',
+        tapTomato: 'Tap tomato',
+        syncTitle: 'Sync your pomodoro history after logging in',
+        syncHint: 'Tap the tomato, then log in or create an account.',
+        account: 'Account',
+        loginRegister: 'Log in / Sign up',
+        close: 'Close',
+        login: 'Log in',
+        register: 'Sign up',
+        username: 'Username',
+        usernamePlaceholder: '3-24 chars, letters / numbers / _ / -',
+        password: 'Password',
+        passwordPlaceholder: 'At least 8 characters',
+        confirmPassword: 'Confirm password',
+        confirmPasswordPlaceholder: 'Enter the password again',
+        submitting: 'Submitting...',
+        createAccount: 'Create account',
+      }
+    : {
+        passwordsMismatch: '两次输入的密码不一致',
+        authFailed: '认证失败',
+        tapTomato: '点击番茄',
+        syncTitle: '登录后同步番茄记录',
+        syncHint: '点一下番茄，再登录或注册。',
+        account: 'Account',
+        loginRegister: '登录 / 注册',
+        close: '关闭',
+        login: '登录',
+        register: '注册',
+        username: '用户名',
+        usernamePlaceholder: '3-24 位，字母/数字/_/-',
+        password: '密码',
+        passwordPlaceholder: '至少 8 位',
+        confirmPassword: '确认密码',
+        confirmPasswordPlaceholder: '再次输入密码',
+        submitting: '提交中...',
+        createAccount: '创建账号',
+      }
 
   useEffect(() => {
     if (!isOpen) {
@@ -27,7 +71,7 @@ function AuthGate({ isOpen, onClose }) {
     setError('')
 
     if (mode === 'register' && password !== confirmPassword) {
-      setError('两次输入的密码不一致')
+      setError(text.passwordsMismatch)
       return
     }
 
@@ -40,7 +84,7 @@ function AuthGate({ isOpen, onClose }) {
       }
       onClose()
     } catch (submitError) {
-      setError(submitError.message || '认证失败')
+      setError(submitError.message || text.authFailed)
     } finally {
       setIsSubmitting(false)
     }
@@ -59,26 +103,26 @@ function AuthGate({ isOpen, onClose }) {
               onClick={() => setIsBouncing(true)}
               onAnimationEnd={() => setIsBouncing(false)}
               className={`auth-tomato relative text-[7rem] leading-none drop-shadow-[0_18px_26px_rgba(154,52,18,0.24)] ${isBouncing ? 'is-bouncing' : ''}`}
-              aria-label="点击番茄"
+              aria-label={text.tapTomato}
             >
               🍅
             </button>
-            <h2 className="mt-5 text-3xl font-black tracking-tight text-black sm:text-4xl">登录后同步番茄记录</h2>
-            <p className="mt-3 text-sm leading-7 text-gray-600">点一下番茄，再登录或注册。</p>
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-black sm:text-4xl">{text.syncTitle}</h2>
+            <p className="mt-3 text-sm leading-7 text-gray-600">{text.syncHint}</p>
           </div>
 
           <div className="rounded-[1.75rem] border border-gray-200 bg-white p-6 shadow-[0_20px_80px_rgba(15,23,42,0.08)] sm:p-8">
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Account</p>
-                <h3 className="mt-2 text-2xl font-black text-black">登录 / 注册</h3>
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">{text.account}</p>
+                <h3 className="mt-2 text-2xl font-black text-black">{text.loginRegister}</h3>
               </div>
               <button
                 type="button"
                 onClick={onClose}
                 className="rounded-full border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-black"
               >
-                关闭
+                {text.close}
               </button>
             </div>
 
@@ -91,7 +135,7 @@ function AuthGate({ isOpen, onClose }) {
                 }}
                 className={`rounded-full px-4 py-2 transition-colors ${mode === 'login' ? 'bg-white text-gray-900 shadow-sm' : 'hover:text-gray-800'}`}
               >
-                登录
+                {text.login}
               </button>
               <button
                 type="button"
@@ -101,31 +145,31 @@ function AuthGate({ isOpen, onClose }) {
                 }}
                 className={`rounded-full px-4 py-2 transition-colors ${mode === 'register' ? 'bg-white text-gray-900 shadow-sm' : 'hover:text-gray-800'}`}
               >
-                注册
+                {text.register}
               </button>
             </div>
 
             <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">用户名</span>
+                <span className="mb-2 block text-sm font-medium text-gray-700">{text.username}</span>
                 <input
                   value={username}
                   onChange={event => setUsername(event.target.value)}
                   className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors focus:border-orange-300 focus:bg-white"
-                  placeholder="3-24 位，字母/数字/_/-"
+                  placeholder={text.usernamePlaceholder}
                   autoComplete={mode === 'login' ? 'username' : 'new-username'}
                   required
                 />
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">密码</span>
+                <span className="mb-2 block text-sm font-medium text-gray-700">{text.password}</span>
                 <input
                   type="password"
                   value={password}
                   onChange={event => setPassword(event.target.value)}
                   className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors focus:border-orange-300 focus:bg-white"
-                  placeholder="至少 8 位"
+                  placeholder={text.passwordPlaceholder}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   required
                 />
@@ -133,13 +177,13 @@ function AuthGate({ isOpen, onClose }) {
 
               {mode === 'register' && (
                 <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-gray-700">确认密码</span>
+                  <span className="mb-2 block text-sm font-medium text-gray-700">{text.confirmPassword}</span>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={event => setConfirmPassword(event.target.value)}
                     className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors focus:border-orange-300 focus:bg-white"
-                    placeholder="再次输入密码"
+                    placeholder={text.confirmPasswordPlaceholder}
                     autoComplete="new-password"
                     required
                   />
@@ -157,7 +201,7 @@ function AuthGate({ isOpen, onClose }) {
                 disabled={isSubmitting}
                 className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                {isSubmitting ? '提交中...' : mode === 'login' ? '登录' : '创建账号'}
+                {isSubmitting ? text.submitting : mode === 'login' ? text.login : text.createAccount}
               </button>
             </form>
           </div>

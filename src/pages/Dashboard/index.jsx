@@ -74,7 +74,7 @@ function Dashboard() {
 
   const text = isEnglish
     ? {
-        title: 'Home',
+        title: 'Dashboard',
         todayAssignments: 'Today assignments',
         dueHint: `Due today ${todayDueCount}, pending ${pendingCount}`,
         todayCourses: 'Today classes',
@@ -94,7 +94,7 @@ function Dashboard() {
         preferences: 'Preferences',
       }
     : {
-        title: '首页',
+        title: '仪表盘',
         todayAssignments: '今日作业',
         dueHint: `今日到期 ${todayDueCount}，剩余 ${pendingCount}`,
         todayCourses: '今日课程',

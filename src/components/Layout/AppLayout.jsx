@@ -14,7 +14,7 @@ function AppLayout() {
         authReady={!isLoading}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
-      <main className="max-w-5xl mx-auto px-4 py-6">
+      <main className="app-main max-w-7xl mx-auto px-4 py-6">
         <Outlet />
       </main>
       <AuthGate

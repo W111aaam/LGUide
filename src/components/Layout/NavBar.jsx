@@ -24,6 +24,7 @@ function NavBar({ authReady, onOpenAuth }) {
         brand: 'LGUide',
         navItems: [
           { to: '/', label: 'Home', end: true },
+          { to: '/dashboard', label: 'Dashboard' },
           { to: '/assignments', label: 'Assignments' },
           { to: '/pomodoro', label: 'Pomodoro' },
           { to: '/resources', label: 'Resources' },
@@ -51,6 +52,7 @@ function NavBar({ authReady, onOpenAuth }) {
         brand: 'LGUide',
         navItems: [
           { to: '/', label: '首页', end: true },
+          { to: '/dashboard', label: '仪表盘' },
           { to: '/assignments', label: '作业管理' },
           { to: '/pomodoro', label: '番茄钟' },
           { to: '/resources', label: '资料' },

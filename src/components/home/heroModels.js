@@ -1,0 +1,78 @@
+export const heroModels = [
+  {
+    id: 'assistant',
+    name: 'LGUide Assistant',
+    path: '/models/home-hero/lguide-assistant.glb',
+    type: 'center',
+    route: '/',
+    size: 2.35,
+    rotation: [0, -0.3, 0],
+  },
+  {
+    id: 'study',
+    name: 'Study Resources',
+    path: '/models/home-hero/study-book.glb',
+    route: '/resources',
+    size: 1.05,
+    rotation: [-0.16, 0.45, 0],
+  },
+  {
+    id: 'pomodoro',
+    name: 'Pomodoro Focus',
+    path: '/models/home-hero/pomodoro-tomato.glb',
+    route: '/pomodoro',
+    size: 1.05,
+    rotation: [0, -0.35, 0],
+  },
+  {
+    id: 'writing',
+    name: 'Writing Assistant',
+    path: '/models/home-hero/writing-pen.glb',
+    href: 'https://md.nero-lithos.com/',
+    size: 1.2,
+    rotation: [0.2, 0.25, -0.62],
+  },
+  {
+    id: 'deadline',
+    name: 'Deadline Manager',
+    path: '/models/home-hero/deadline-notebook.glb',
+    route: '/assignments',
+    size: 1.08,
+    rotation: [-0.18, -0.35, 0],
+  },
+  {
+    id: 'settings',
+    name: 'Settings',
+    path: '/models/home-hero/settings-gear.glb',
+    route: '/settings',
+    size: 1.02,
+    rotation: [0.08, 0.2, 0],
+  },
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    path: '/models/home-hero/dashboard-console.glb',
+    route: '/dashboard',
+    size: 1.15,
+    rotation: [-0.12, -0.5, 0],
+  },
+  {
+    id: 'courses',
+    name: 'Course Selection',
+    path: '/models/home-hero/course-compass.glb',
+    href: 'https://blog.nero-lithos.com/courseai/',
+    size: 1.05,
+    rotation: [0.15, 0.45 + Math.PI, 0],
+  },
+  {
+    id: 'timetable',
+    name: 'Timetable',
+    path: '/models/home-hero/calendar-schedule.glb',
+    route: '/schedule',
+    size: 1.08,
+    rotation: [-0.15, 0.25 + Math.PI, 0],
+  },
+]
+
+export const orbitModels = heroModels.filter(model => model.type !== 'center')
+export const centerModel = heroModels.find(model => model.type === 'center')

@@ -11,6 +11,7 @@
 | 番茄钟 | 基础功能和显示互动完成，闹钟提示完成 |
 | 课表管理 | 框架完成，提示功能完成 |
 | 偏好设置 | 占位完成，功能未完全实现 |
+| Blackboard 同步 | bbwatch 安全同步作业、DDL、公告和课件元数据 |
 
 ## 技术栈
 
@@ -75,6 +76,36 @@ VITE_POMODORO_API_BASE=https://你的-worker.workers.dev
 ```
 
 生产环境推荐在 Cloudflare 给 Worker 配置 Route：`lguide.net/api/*`，这样前端无需额外环境变量。
+
+## Blackboard / bbwatch 集成
+
+LGUide 不保存学校账号密码。Blackboard 登录、Cookie 与扫描继续在学生本机的
+[`bbwatch`](https://github.com/W111aaam/bbwatch) 中完成，LGUide 仅接收标准化学习数据。
+
+1. 登录 LGUide，打开 `/blackboard`。
+2. 点击“生成同步令牌”并复制令牌。
+3. 安装或更新 `W111aaam/bbwatch` fork 后运行：
+
+```bash
+bbwatch lguide-connect --url https://lguide.net
+```
+
+4. 在隐藏输入提示中粘贴同步令牌。之后每次执行 `bbwatch scan` 都会自动同步。
+
+也可手动同步或移除本机连接：
+
+```bash
+bbwatch lguide-sync
+bbwatch lguide-disconnect
+```
+
+部署 Worker 前需应用新增 D1 表：
+
+```bash
+cd worker
+npx wrangler d1 execute pomodoro-db --remote --file=./schema.sql
+npx wrangler deploy
+```
 
 
 

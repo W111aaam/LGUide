@@ -7,6 +7,7 @@ import Resources from './pages/Resources'
 import Schedule from './pages/Schedule'
 import Settings from './pages/Settings'
 import Home from './pages/Home'
+import Blackboard from './pages/Blackboard'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="pomodoro" element={<Pomodoro />} />
           <Route path="resources" element={<Resources />} />
           <Route path="resources/:resourceName" element={<Resources />} />
+          <Route path="blackboard" element={<Blackboard />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="settings" element={<Settings />} />
         </Route>

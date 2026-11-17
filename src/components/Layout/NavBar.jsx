@@ -28,6 +28,7 @@ function NavBar({ authReady, onOpenAuth }) {
           { to: '/assignments', label: 'Assignments' },
           { to: '/pomodoro', label: 'Pomodoro' },
           { to: '/resources', label: 'Resources' },
+          { to: '/blackboard', label: 'Blackboard' },
           {
             href: 'https://blog.nero-lithos.com/courseai/',
             label: 'Course Helper',
@@ -56,6 +57,7 @@ function NavBar({ authReady, onOpenAuth }) {
           { to: '/assignments', label: '作业管理' },
           { to: '/pomodoro', label: '番茄钟' },
           { to: '/resources', label: '资料' },
+          { to: '/blackboard', label: 'Blackboard' },
           {
             href: 'https://blog.nero-lithos.com/courseai/',
             label: '选课助手',

@@ -9,8 +9,8 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 import venv
 
-SITE = "https://lguide.net"
-PACKAGE = "https://github.com/W111aaam/bbwatch/archive/57077e41d4b8c38692afddca191078c2997870c4.zip"
+SITE = "https://lguide-pomodoro-api.zhuan0140.workers.dev"
+PACKAGE = "https://github.com/W111aaam/bbwatch/archive/d0d8bc418f88fcdf9dca418b9d71b88790d4a240.zip"
 
 
 def main():
@@ -48,7 +48,7 @@ except CredentialError:
             raise RuntimeError("配对码已失效，请回到网页重新复制命令。") from exc
         raise RuntimeError(f"LGUide 配对服务返回 HTTP {exc.code}。") from exc
     subprocess.run(
-        [str(python), "-c", "import sys; from bbwatch.lguide import store_connection; store_connection(sys.stdin.read())"],
+        [str(python), "-c", "import sys; from bbwatch.lguide import store_connection; store_connection(sys.stdin.read(), sys.argv[1])", SITE],
         input=token, text=True, check=True,
     )
     print("已连接 LGUide，开始首次 Blackboard 扫描。", flush=True)

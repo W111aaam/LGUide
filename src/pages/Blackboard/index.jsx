@@ -84,7 +84,7 @@ function BlackboardPage({ user }) {
   }, [pairing])
 
   const command = pairing && /^[A-Z2-9]{5}-[A-Z2-9]{5}$/.test(pairing.code)
-    ? `${windows ? 'py -3' : 'python3'} -c "from urllib.request import urlopen; exec(compile(urlopen('https://lguide.net/bbwatch-setup.py', timeout=30).read(), 'bbwatch-setup.py', 'exec'))" ${pairing.code}`
+    ? `${windows ? 'py -3' : 'python3'} -c "from urllib.request import urlopen; exec(compile(urlopen('https://raw.githubusercontent.com/W111aaam/LGUide/main/public/bbwatch-setup.py', timeout=30).read(), 'bbwatch-setup.py', 'exec'))" ${pairing.code}`
     : ''
 
   async function createPairing() {

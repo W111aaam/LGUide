@@ -100,3 +100,12 @@ CREATE TABLE IF NOT EXISTS blackboard_materials (
   PRIMARY KEY (user_id, entity_key),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS blackboard_pairing_codes (
+  code_hash TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);

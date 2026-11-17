@@ -83,14 +83,22 @@ LGUide 不保存学校账号密码。Blackboard 登录、Cookie 与扫描继续�
 [`bbwatch`](https://github.com/W111aaam/bbwatch) 中完成，LGUide 仅接收标准化学习数据。
 
 1. 登录 LGUide，打开 `/blackboard`。
-2. 点击“生成同步令牌”并复制令牌。
-3. 安装或更新 `W111aaam/bbwatch` fork 后运行：
+2. 点击“连接 Blackboard”，复制网页生成的命令。
+3. 在终端（Windows 用 PowerShell）粘贴并运行，电脑需安装 Python 3.11+。
+   命令会安装配套的 bbwatch、连接 LGUide 并发起首次扫描。首次使用时在本机输入学校账号与密码。
+
+配对码只能使用一次，10 分钟后失效。之后每次运行 bbwatch 扫描都会同步，
+例如通过网页安装的版本可用以下命令再次扫描：
 
 ```bash
-bbwatch lguide-connect --url https://lguide.net
+~/.lguide/bbwatch/venv/bin/python -m bbwatch.cli scan
 ```
 
-4. 在隐藏输入提示中粘贴同步令牌。之后每次执行 `bbwatch scan` 都会自动同步。
+Windows PowerShell：
+
+```powershell
+& "$env:USERPROFILE/.lguide/bbwatch/venv/Scripts/python.exe" -m bbwatch.cli scan
+```
 
 也可手动同步或移除本机连接：
 

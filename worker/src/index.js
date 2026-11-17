@@ -119,6 +119,14 @@ const BLACKBOARD_SCHEMA_STATEMENTS = [
     PRIMARY KEY (user_id, entity_key),
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`,
+  `CREATE TABLE IF NOT EXISTS blackboard_pairing_codes (
+    code_hash TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`,
 ];
 
 let schemaReadyPromise = null;
@@ -520,6 +528,46 @@ export default {
         );
       }
 
+      if (path === "/api/blackboard/pairing-code" && request.method === "POST") {
+        const authSession = await requireAuthenticatedSession(request, env, defaultHeaders, requestId);
+        if (authSession instanceof Response) return authSession;
+        const code = createPairingCode();
+        const codeHash = await sha256(normalizePairingCode(code));
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + 10 * 60 * 1000);
+        await env.DB.batch([
+          env.DB.prepare("DELETE FROM blackboard_pairing_codes WHERE user_id=?1 OR expires_at<=?2").bind(authSession.user.id, now.toISOString()),
+          env.DB.prepare("INSERT INTO blackboard_pairing_codes (code_hash, user_id, created_at, expires_at) VALUES (?1, ?2, ?3, ?4)")
+            .bind(codeHash, authSession.user.id, now.toISOString(), expiresAt.toISOString()),
+        ]);
+        return json({ ok: true, code, created_at: now.toISOString(), expires_at: expiresAt.toISOString(), request_id: requestId }, 201, { ...defaultHeaders, "Cache-Control": "no-store" });
+      }
+
+      if (path === "/api/blackboard/pair" && request.method === "POST") {
+        const body = await request.json().catch(() => ({}));
+        const code = normalizePairingCode(body.code);
+        if (!/^[A-Z2-9]{10}$/.test(code)) {
+          return json({ error: "配对码格式无效", request_id: requestId }, 400, defaultHeaders);
+        }
+        const codeHash = await sha256(code);
+        const now = new Date().toISOString();
+        const token = `lgbb_${createRandomToken(32)}`;
+        const tokenHash = await sha256(token);
+        const [redeemed] = await env.DB.batch([
+          env.DB.prepare(`
+            INSERT INTO blackboard_connections (user_id, token_hash, created_at, source)
+            SELECT user_id, ?2, ?3, 'bbwatch' FROM blackboard_pairing_codes
+            WHERE code_hash=?1 AND used_at IS NULL AND expires_at>?3
+            ON CONFLICT(user_id) DO UPDATE SET token_hash=excluded.token_hash, created_at=excluded.created_at, source=excluded.source
+          `).bind(codeHash, tokenHash, now),
+          env.DB.prepare("DELETE FROM blackboard_pairing_codes WHERE code_hash=?1").bind(codeHash),
+        ]);
+        if (!redeemed.meta.changes) {
+          return json({ error: "配对码无效、已使用或已过期", request_id: requestId }, 401, defaultHeaders);
+        }
+        return json({ ok: true, token, created_at: now, request_id: requestId }, 201, { ...defaultHeaders, "Cache-Control": "no-store" });
+      }
+
       if (path === "/api/blackboard/connect-token" && request.method === "POST") {
         const authSession = await requireAuthenticatedSession(request, env, defaultHeaders, requestId);
         if (authSession instanceof Response) return authSession;
@@ -574,6 +622,7 @@ export default {
         if (authSession instanceof Response) return authSession;
         const userId = authSession.user.id;
         await env.DB.batch([
+          env.DB.prepare("DELETE FROM blackboard_pairing_codes WHERE user_id=?1").bind(userId),
           env.DB.prepare("DELETE FROM blackboard_courses WHERE user_id=?1").bind(userId),
           env.DB.prepare("DELETE FROM blackboard_tasks WHERE user_id=?1").bind(userId),
           env.DB.prepare("DELETE FROM blackboard_announcements WHERE user_id=?1").bind(userId),
@@ -808,6 +857,17 @@ function validateCredentials(username, password) {
 function createRandomToken(byteLength = 32) {
   const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
   return bytesToBase64Url(bytes);
+}
+
+function createPairingCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(10));
+  const value = Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+  return `${value.slice(0, 5)}-${value.slice(5)}`;
+}
+
+function normalizePairingCode(value) {
+  return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
 function bytesToBase64Url(bytes) {
